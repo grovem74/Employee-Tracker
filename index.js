@@ -4,6 +4,9 @@ var consoletable = require("console.table");
 // var Functions = require("./js/functions");
 
 let departmentChoice;
+let departmentID;
+let departmentName;
+let deletedDepartmentName;
 
 
 var connection = mysql.createConnection({
@@ -17,7 +20,7 @@ var connection = mysql.createConnection({
 connection.connect((err) => {
     if (err) throw err;
     console.log("connected as id " + connection.threadId + "\n");
-    viewDepartments();
+    getDepartments();
     getInfo();
 })
 
@@ -28,7 +31,7 @@ const questions = [
         type: "list",
         name: "action",
         message: "What would you like to do?",
-        choices: ["View all employees", "View employees by department", "View employees by manager", "Add a department", "Add a role", "Update a role", "Add an employee", "Update an employee", "EXIT"]
+        choices: ["View all employees", "View employees by department", "View employees by manager", "Add a department", "Delete a department", "Add a role", "Update a role", "Add an employee", "Update an employee", "EXIT"]
     },
     {
         type: "list",
@@ -53,6 +56,15 @@ const questions = [
         message: "Enter the name of the department:",
         when: function (answers) {
             return answers.action === "Add a department";
+        }
+    },
+    {
+        type: "list",
+        name: "deptDeleteName",
+        message: "Choose a department to delete:",
+        choices: departments,
+        when: function (answers) {
+            return answers.action === "Delete a department";
         }
     },
     {
@@ -125,10 +137,11 @@ const data = [];
 
 function askQuestions() {
     return inquirer.prompt(questions).then(answers => {
-        let departmentName = answers.deptName;
+        departmentName = answers.deptName;
+        deletedDepartmentName = answers.deptDeleteName;
         let role = answers.roleTitle;
         let salary = answers.roleSalary;
-        let departmentID = answers.deptID;
+        departmentID = answers.deptID;
         departmentChoice = answers.deptChoice;
         let firstName = answers.fname;
         let lastName = answers.lname;
@@ -152,26 +165,29 @@ function askQuestions() {
 
         if (answers.action === "Add a department") {
             departments.push(answers.deptName);
-            console.log("Departments:")
+            console.log(`You created '${departmentName}'`)
+            addDepartment();
+        }
+
+        if (answers.action === "Delete a department") {
+            deleteDepartment();
+            console.log(`You deleted '${deletedDepartmentName}'`)
         }
 
         if (answers.action === "EXIT") {
-            console.log("Your changes:");
-            console.log("--------------");
-            consoletable.data;
+            console.log("DONE!");
         };
 
         if (answers.continue === true) {
             askQuestions();
         } else {
-            console.log("Your changes:");
-            console.log("--------------");
-            console.table(data);
+            connection.end();
         };
     });
 };
 
-function viewDepartments() {
+
+function getDepartments() {
     connection.query(`SELECT dept_name FROM companydb.departments;`, function (err, res) {
         if (err) throw err;
         for (var i = 0; i < res.length; i++) {
@@ -182,9 +198,9 @@ function viewDepartments() {
 
 function viewAllEmployees() {
     connection.query(`SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.dept_name, roles.salary, managers.manager_name
-    FROM ((departments
-    INNER JOIN roles ON roles.dept_id = departments.id)
-    INNER JOIN employees ON employees.role_id = roles.id)
+    FROM departments
+    INNER JOIN roles ON roles.dept_id = departments.id
+    INNER JOIN employees ON employees.role_id = roles.id
     INNER JOIN managers ON managers.id = employees.manager_id`, function (err, res) {
         if (err) throw err;
         console.table(res);
@@ -202,6 +218,20 @@ function viewEmployeesByDepartment() {
         if (err) throw err;
         console.table(res);
         connection.end();
+    });
+}
+
+function addDepartment() {
+    connection.query(`INSERT INTO departments (id, dept_name)
+    VALUES (${departmentID}, "${departmentName}");`, function (err, res) {
+        if (err) throw err;
+    });
+}
+
+function deleteDepartment() {
+    connection.query(`DELETE FROM departments
+    WHERE dept_name = "${deletedDepartmentName}";`, function (err, res) {
+        if (err) throw err;
     });
 }
 
