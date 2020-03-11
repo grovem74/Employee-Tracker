@@ -3,6 +3,8 @@ var inquirer = require("inquirer");
 var consoletable = require("console.table");
 // var Functions = require("./js/functions");
 
+let departmentChoice;
+
 
 var connection = mysql.createConnection({
     host: "localhost",
@@ -15,9 +17,12 @@ var connection = mysql.createConnection({
 connection.connect((err) => {
     if (err) throw err;
     console.log("connected as id " + connection.threadId + "\n");
+    viewDepartments();
     getInfo();
 })
+
 const departments = [];
+
 const questions = [
     {
         type: "list",
@@ -27,11 +32,19 @@ const questions = [
     },
     {
         type: "list",
-        name: "deptName",
+        name: "deptChoice",
         message: "Choose a department:",
         choices: departments,
         when: function (answers) {
             return answers.action === "View employees by department";
+        }
+    },
+    {
+        type: "input",
+        name: "deptID",
+        message: "Enter the department ID:",
+        when: function (answers) {
+            return answers.action === "Add a department";
         }
     },
     {
@@ -103,7 +116,7 @@ const questions = [
         name: "continue",
         message: "Would you like to continue?",
         when: function (answers) {
-            return answers.action != "EXIT"
+            return answers.action != "EXIT" && answers.action != "View employees by department" && answers.action != "View all employees";
         }
     }
 ];
@@ -116,12 +129,14 @@ function askQuestions() {
         let role = answers.roleTitle;
         let salary = answers.roleSalary;
         let departmentID = answers.deptID;
+        departmentChoice = answers.deptChoice;
         let firstName = answers.fname;
         let lastName = answers.lname;
         let roleDepartmentID = answers.roleDeptID;
         let managerID = answers.managerID;
 
         data.push(answers);
+        console.log(departmentChoice);
 
         if (answers.action === "View all employees") {
             viewAllEmployees();
@@ -143,7 +158,7 @@ function askQuestions() {
         if (answers.action === "EXIT") {
             console.log("Your changes:");
             console.log("--------------");
-            console.table(data)
+            consoletable.data;
         };
 
         if (answers.continue === true) {
@@ -156,12 +171,21 @@ function askQuestions() {
     });
 };
 
+function viewDepartments() {
+    connection.query(`SELECT dept_name FROM companydb.departments;`, function (err, res) {
+        if (err) throw err;
+        for (var i = 0; i < res.length; i++) {
+            departments.push(res[i].dept_name);
+        }
+    })
+};
 
 function viewAllEmployees() {
-    connection.query(`SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.dept_name, roles.salary
-        FROM ((departments
-        INNER JOIN roles ON roles.dept_id = departments.id)
-        INNER JOIN employees ON employees.role_id = roles.id)`, function (err, res) {
+    connection.query(`SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.dept_name, roles.salary, managers.manager_name
+    FROM ((departments
+    INNER JOIN roles ON roles.dept_id = departments.id)
+    INNER JOIN employees ON employees.role_id = roles.id)
+    INNER JOIN managers ON managers.id = employees.manager_id`, function (err, res) {
         if (err) throw err;
         console.table(res);
         connection.end();
@@ -169,11 +193,12 @@ function viewAllEmployees() {
 };
 
 function viewEmployeesByDepartment() {
-    connection.query(`SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.dept_name, roles.salary, employees.manager_id
-        FROM ((departments
-        INNER JOIN roles ON roles.dept_id = departments.id)
-        INNER JOIN employees ON employees.role_id = roles.id)
-        WHERE roles.dept_id = ${deptID};`, function (err, res) {
+    connection.query(`SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.dept_name, roles.salary, managers.manager_name
+    FROM (((departments
+    INNER JOIN roles ON roles.dept_id = departments.id)
+    INNER JOIN employees ON employees.role_id = roles.id)
+    INNER JOIN managers ON managers.id = employees.manager_id)
+    WHERE departments.dept_name = "${departmentChoice}";`, function (err, res) {
         if (err) throw err;
         console.table(res);
         connection.end();
