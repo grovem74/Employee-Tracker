@@ -1,28 +1,38 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 var consoletable = require("console.table");
-var Functions = require("./js/functions");
+// var Functions = require("./js/functions");
 
 
 var connection = mysql.createConnection({
-    host:"localhost",
+    host: "localhost",
     port: 3306,
     user: "root",
     password: "myPassroot4sql$",
     database: "companyDB"
 });
 
-connection.connect((err)=> {
+connection.connect((err) => {
     if (err) throw err;
     console.log("connected as id " + connection.threadId + "\n");
+    getInfo();
 })
-
+const departments = [];
 const questions = [
     {
         type: "list",
         name: "action",
         message: "What would you like to do?",
-        choices: ["View all employees", "View employees by department","View employees by manager","Add a department", "Add a role", "Update a role","Add an employee", "Update an employee","EXIT"]
+        choices: ["View all employees", "View employees by department", "View employees by manager", "Add a department", "Add a role", "Update a role", "Add an employee", "Update an employee", "EXIT"]
+    },
+    {
+        type: "list",
+        name: "deptName",
+        message: "Choose a department:",
+        choices: departments,
+        when: function (answers) {
+            return answers.action === "View employees by department";
+        }
     },
     {
         type: "input",
@@ -93,7 +103,7 @@ const questions = [
         name: "continue",
         message: "Would you like to continue?",
         when: function (answers) {
-            return answers.action != "Exit"
+            return answers.action != "EXIT"
         }
     }
 ];
@@ -112,7 +122,24 @@ function askQuestions() {
         let managerID = answers.managerID;
 
         data.push(answers);
-    
+
+        if (answers.action === "View all employees") {
+            viewAllEmployees();
+        }
+
+        if (answers.action === "View employees by department") {
+            viewEmployeesByDepartment();
+        }
+
+        if (answers.action === "View employees by manager") {
+            viewEmployeesByManager();
+        }
+
+        if (answers.action === "Add a department") {
+            departments.push(answers.deptName);
+            console.log("Departments:")
+        }
+
         if (answers.action === "EXIT") {
             console.log("Your changes:");
             console.log("--------------");
@@ -126,27 +153,33 @@ function askQuestions() {
             console.log("--------------");
             console.table(data);
         };
-
-        if (answers.action === "View all employees") {
-            viewAllEmployees(); 
-        }
     });
 };
 
 
 function viewAllEmployees() {
-    connection.query(`SELECT departments.dept_name, employees.first_name, employees.last_name, roles.title
+    connection.query(`SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.dept_name, roles.salary
         FROM ((departments
-        INNER JOIN roles ON roles.department_id = departments.id)
+        INNER JOIN roles ON roles.dept_id = departments.id)
         INNER JOIN employees ON employees.role_id = roles.id)`, function (err, res) {
         if (err) throw err;
-        console.log(res);
+        console.table(res);
         connection.end();
     });
- 
+};
+
+function viewEmployeesByDepartment() {
+    connection.query(`SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.dept_name, roles.salary, employees.manager_id
+        FROM ((departments
+        INNER JOIN roles ON roles.dept_id = departments.id)
+        INNER JOIN employees ON employees.role_id = roles.id)
+        WHERE roles.dept_id = ${deptID};`, function (err, res) {
+        if (err) throw err;
+        console.table(res);
+        connection.end();
+    });
 }
+
 async function getInfo() {
     askQuestions();
 };
-
-getInfo();

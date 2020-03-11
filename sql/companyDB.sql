@@ -21,13 +21,21 @@ CREATE TABLE roles
     FOREIGN KEY (dept_id) REFERENCES departments (id)
 );
 
+CREATE TABLE managers
+(
+    id INT,
+    manager_name VARCHAR(30) NOT NULL,
+    PRIMARY KEY(id)
+);
+
 CREATE TABLE employees
 (
     id INT,
     first_name VARCHAR(30) NOT NULL,
     last_name VARCHAR(30) NOT NULL,
     role_id INT NOT NULL,
-    manager_id INT NULL,
+    manager_id INT,
     PRIMARY KEY(id),
-    FOREIGN KEY (role_id) REFERENCES roles (id)
-)
+    FOREIGN KEY (role_id) REFERENCES roles (id),
+    FOREIGN KEY (manager_id) REFERENCES managers (id)
+);
