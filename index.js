@@ -1,32 +1,9 @@
+// Dependencies
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 var consoletable = require("console.table");
-// var Functions = require("./js/functions");
 
-let departmentChoice;
-let departmentID;
-let departmentName;
-let deletedDepartmentName;
-let managerChoice;
-let salary;
-let title;
-let roleID;
-let roleDeptID;
-let updatedRole;
-let updatedTitle;
-let updatedSalary;
-let employeeID;
-let fname;
-let lname;
-let employeeManagerID;
-let employeeRoleID;
-let updatedEmployee;
-let updatedFirstName;
-let updatedLastName;
-let updatedEmployeeRoleID;
-let updatedEmployeeManagerID;
-let updatedRoleDeptID;
-
+// SQL set up
 var connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
@@ -45,6 +22,7 @@ connection.connect((err) => {
     getInfo();
 })
 
+// Global variables
 const departments = [];
 
 const departmentIDs = [];
@@ -286,6 +264,8 @@ const advance = [
     }
 ]
 
+// functions
+
 function advancePrompts() {
     return inquirer.prompt(advance).then(answers => {
 
@@ -295,6 +275,44 @@ function advancePrompts() {
             connection.end();
         };
     });
+};
+
+async function getDepartments() {
+    connection.query(`SELECT id, dept_name FROM companydb.departments;`, function (err, res) {
+        if (err) throw err;
+        for (var i = 0; i < res.length; i++) {
+            departments.push(res[i].dept_name);
+            departmentIDs.push(res[i].id);
+        }
+    })
+};
+
+function getRoles() {
+    connection.query(`SELECT id FROM companydb.roles;`, function (err, res) {
+        if (err) throw err;
+        for (var i = 0; i < res.length; i++) {
+            roles.push(res[i].id);
+        }
+    })
+};
+
+function getManagers() {
+    connection.query(`SELECT mgr_last_name, id FROM companydb.managers;`, function (err, res) {
+        if (err) throw err;
+        for (var i = 0; i < res.length; i++) {
+            managers.push(res[i].mgr_last_name);
+            managerIDs.push(res[i].id);
+        }
+    })
+};
+
+function getEmployees() {
+    connection.query(`SELECT first_name, last_name FROM companydb.employees;`, function (err, res) {
+        if (err) throw err;
+        for (var i = 0; i < res.length; i++) {
+            employees.push(res[i].first_name + " " + res[i].last_name);
+        }
+    })
 };
 
 function askQuestions() {
@@ -345,7 +363,6 @@ function askQuestions() {
 
         if (answers.action === "Add a department") {
             departments.push(answers.deptName);
-            // departmentIDs.push(answers.deptID);
             addDepartment();
         };
 
@@ -379,52 +396,13 @@ function askQuestions() {
 
         if (answers.action === "EXIT") {
             console.log("DONE!");
+            connection.end();
         };
     });
 };
 
-
-async function getDepartments() {
-    connection.query(`SELECT id, dept_name FROM companydb.departments;`, function (err, res) {
-        if (err) throw err;
-        for (var i = 0; i < res.length; i++) {
-            departments.push(res[i].dept_name);
-            departmentIDs.push(res[i].id);
-        }
-    })
-};
-
-function getRoles() {
-    connection.query(`SELECT id FROM companydb.roles;`, function (err, res) {
-        if (err) throw err;
-        for (var i = 0; i < res.length; i++) {
-            roles.push(res[i].id);
-        }
-    })
-};
-
-function getManagers() {
-    connection.query(`SELECT manager_name, id FROM companydb.managers;`, function (err, res) {
-        if (err) throw err;
-        for (var i = 0; i < res.length; i++) {
-            managers.push(res[i].manager_name);
-            managerIDs.push(res[i].id);
-        }
-    })
-};
-
-function getEmployees() {
-    connection.query(`SELECT first_name, last_name FROM companydb.employees;`, function (err, res) {
-        if (err) throw err;
-        for (var i = 0; i < res.length; i++) {
-            employees.push(res[i].first_name);
-        }
-    })
-};
-
-
 function viewAllEmployees() {
-    connection.query(`SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.dept_name, roles.salary, managers.manager_name
+    connection.query(`SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.dept_name, roles.salary, managers.mgr_first_name
     FROM departments
     INNER JOIN roles ON roles.dept_id = departments.id
     INNER JOIN employees ON employees.role_id = roles.id
@@ -432,11 +410,11 @@ function viewAllEmployees() {
         if (err) throw err;
         console.table(res);
         advancePrompts();
-     });
+    });
 };
 
 function viewEmployeesByDepartment() {
-    connection.query(`SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.dept_name, roles.salary, managers.manager_name
+    connection.query(`SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.dept_name, roles.salary, managers.mgr_first_name, managers.mgr_last_name
     FROM (((departments
     INNER JOIN roles ON roles.dept_id = departments.id)
     INNER JOIN employees ON employees.role_id = roles.id)
@@ -446,20 +424,20 @@ function viewEmployeesByDepartment() {
         console.table(res);
         advancePrompts();
     });
-}
+};
 
 function viewEmployeesByManager() {
-    connection.query(`SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.dept_name, roles.salary, managers.manager_name
-    FROM (((departments
-    INNER JOIN roles ON roles.dept_id = departments.id)
-    INNER JOIN employees ON employees.role_id = roles.id)
-    INNER JOIN managers ON managers.id = employees.manager_id)
-    WHERE managers.manager_name = "${managerChoice}";`, function (err, res) {
+    connection.query(`SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.dept_name, roles.salary, managers.mgr_first_name, managers.mgr_last_name
+    FROM departments
+    INNER JOIN roles ON roles.dept_id = departments.id
+    INNER JOIN employees ON employees.role_id = roles.id
+    INNER JOIN managers ON managers.id = employees.manager_id
+    WHERE managers.mgr_last_name = "${managerChoice}";`, function (err, res) {
         if (err) throw err;
         console.table(res);
         advancePrompts();
     });
-}
+};
 
 function addDepartment() {
     connection.query(`INSERT INTO departments (id, dept_name)
@@ -504,8 +482,9 @@ function deleteRole() {
 
 function addEmployee() {
     connection.query(`INSERT INTO employees (id, first_name, last_name, role_id, manager_id)
-    VALUES (${employeeID}, "${fname}", "${lname}", "${employeeRoleID}", "${employeeManagerID}");`, function (err, res) {
+    VALUES (${employeeID}, "${fname}", "${lname}", ${employeeRoleID}, ${employeeManagerID});`, function (err, res) {
         if (err) throw err;
+        updateFullName();
         advancePrompts();
     });
 };
@@ -513,16 +492,18 @@ function addEmployee() {
 function updateEmployee() {
     connection.query(`UPDATE employees
     SET first_name = "${updatedFirstName}", last_name = "${updatedLastName}", role_id = ${updatedEmployeeRoleID}, manager_id = ${updatedEmployeeManagerID}
-    WHERE first_name = "${updatedEmployee}";`, function (err, res) {
+    WHERE full_name="${updatedEmployee}";`, function (err, res) {
         if (err) throw err;
+        updateFullName();
         advancePrompts();
     });
 };
 
 function deleteEmployee() {
     connection.query(`DELETE FROM employees
-    WHERE first_name = "${updatedEmployee}";`, function (err, res) {
+    WHERE full_name = "${updatedEmployee}";`, function (err, res) {
         if (err) throw err;
+        updateFullName();
         advancePrompts();
     });
 };
@@ -530,3 +511,12 @@ function deleteEmployee() {
 async function getInfo() {
     askQuestions();
 };
+
+
+function updateFullName() {
+    connection.query(`UPDATE employees
+    SET full_name = CONCAT(first_name, " ", last_name);`, function (err, res) {
+        if (err) throw err;
+    })
+};
+
