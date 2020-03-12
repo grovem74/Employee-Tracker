@@ -7,6 +7,7 @@ let departmentChoice;
 let departmentID;
 let departmentName;
 let deletedDepartmentName;
+let managerChoice;
 let salary;
 let title;
 let roleID;
@@ -76,7 +77,7 @@ const questions = [
         type: "list",
         name: "managerChoice",
         message: "Select a manager:",
-        choices: departments,
+        choices: managers,
         when: function (answers) {
             return answers.action === "View employees by manager";
         }
@@ -243,15 +244,6 @@ const questions = [
             return answers.action === "Update an employee";
         }
     },
-    // {
-    //     type: "list",
-    //     name: "updatedEmployee",
-    //     message: "Select an employee:",
-    //     choices: employees,
-    //     when: function (answers) {
-    //         return answers.employeeUpdateChoice === "Update";
-    //     }
-    // },
     {
         type: "input",
         name: "updatedFirstName",
@@ -309,6 +301,7 @@ function askQuestions() {
     return inquirer.prompt(questions).then(answers => {
         departmentName = answers.deptName;
         deletedDepartmentName = answers.deptDeleteName;
+        managerChoice = answers.managerChoice;
         title = answers.roleTitle;
         roleID = answers.roleID;
         salary = answers.roleSalary;
@@ -341,7 +334,6 @@ function askQuestions() {
 
         if (answers.action === "View employees by manager") {
             viewEmployeesByManager();
-            advancePrompts();
         };
 
         if (answers.action === "View departments") {
@@ -438,11 +430,9 @@ function viewAllEmployees() {
     INNER JOIN employees ON employees.role_id = roles.id
     INNER JOIN managers ON managers.id = employees.manager_id`, function (err, res) {
         if (err) throw err;
-
         console.table(res);
         advancePrompts();
-        // connection.end();
-    });
+     });
 };
 
 function viewEmployeesByDepartment() {
@@ -455,7 +445,19 @@ function viewEmployeesByDepartment() {
         if (err) throw err;
         console.table(res);
         advancePrompts();
-        // connection.end();
+    });
+}
+
+function viewEmployeesByManager() {
+    connection.query(`SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.dept_name, roles.salary, managers.manager_name
+    FROM (((departments
+    INNER JOIN roles ON roles.dept_id = departments.id)
+    INNER JOIN employees ON employees.role_id = roles.id)
+    INNER JOIN managers ON managers.id = employees.manager_id)
+    WHERE managers.manager_name = "${managerChoice}";`, function (err, res) {
+        if (err) throw err;
+        console.table(res);
+        advancePrompts();
     });
 }
 
