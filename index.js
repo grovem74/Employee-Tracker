@@ -31,21 +31,30 @@ const questions = [
         type: "list",
         name: "action",
         message: "What would you like to do?",
-        choices: ["View all employees", "View employees by department", "View employees by manager", "Add a department", "Delete a department", "Add a role", "Update a role", "Add an employee", "Update an employee", "EXIT"]
+        choices: ["View all employees", "View employees by department", "View employees by manager", "View departments","Add a department", "Delete a department", "Add a role", "Update a role", "Add an employee", "Update an employee", "EXIT"]
     },
     {
         type: "list",
         name: "deptChoice",
-        message: "Choose a department:",
+        message: "Select a department:",
         choices: departments,
         when: function (answers) {
             return answers.action === "View employees by department";
         }
     },
     {
+        type: "list",
+        name: "deptChoice",
+        message: "Select a manager:",
+        choices: departments,
+        when: function (answers) {
+            return answers.action === "View employees by manager";
+        }
+    },
+    {
         type: "input",
         name: "deptID",
-        message: "Enter the department ID:",
+        message: "Enter a department ID:",
         when: function (answers) {
             return answers.action === "Add a department";
         }
@@ -53,7 +62,7 @@ const questions = [
     {
         type: "input",
         name: "deptName",
-        message: "Enter the name of the department:",
+        message: "Enter the department name:",
         when: function (answers) {
             return answers.action === "Add a department";
         }
@@ -61,7 +70,7 @@ const questions = [
     {
         type: "list",
         name: "deptDeleteName",
-        message: "Choose a department to delete:",
+        message: "Select department to delete:",
         choices: departments,
         when: function (answers) {
             return answers.action === "Delete a department";
@@ -70,7 +79,8 @@ const questions = [
     {
         type: "input",
         name: "roleTitle",
-        message: "Enter the title for the new role:",
+        message: "Enter a title for the new role:",
+
         when: function (answers) {
             return answers.action === "Add a role";
         }
@@ -78,7 +88,7 @@ const questions = [
     {
         type: "input",
         name: "roleSalary",
-        message: "Enter the salary for the new role:",
+        message: "Enter a salary for the new role:",
         when: function (answers) {
             return answers.action === "Add a role";
         }
@@ -86,7 +96,7 @@ const questions = [
     {
         type: "input",
         name: "roleDeptID",
-        message: "Enter the department ID for the new role:",
+        message: "Enter a department ID for the new role:",
         when: function (answers) {
             return answers.action === "Add a role";
         }
@@ -123,17 +133,27 @@ const questions = [
             return answers.action === "Add an employee";
         }
     },
+];
+
+const advance =[
     {
         type: "confirm",
         name: "continue",
-        message: "Would you like to continue?",
-        when: function (answers) {
-            return answers.action != "EXIT" && answers.action != "View employees by department" && answers.action != "View all employees";
-        }
+        message: "Would you like to make additional changes/queries?",
     }
-];
-
+]
 const data = [];
+
+function advancePrompts() {
+    return inquirer.prompt(advance).then(answers => {
+        
+        if (answers.continue === true) {
+            askQuestions();
+        } else {
+            connection.end();
+        };
+    });
+};
 
 function askQuestions() {
     return inquirer.prompt(questions).then(answers => {
@@ -149,7 +169,7 @@ function askQuestions() {
         let managerID = answers.managerID;
 
         data.push(answers);
-        console.log(departmentChoice);
+     
 
         if (answers.action === "View all employees") {
             viewAllEmployees();
@@ -161,33 +181,33 @@ function askQuestions() {
 
         if (answers.action === "View employees by manager") {
             viewEmployeesByManager();
+            advancePrompts();
+        }
+
+        if (answers.action === "View departments") {
+            var list = departments.toString();
+            var splitList = list.split(",").join("\n");
+            console.log(`\nDEPARTMENTS\n-----------\n\n${splitList}\n`);
+            advancePrompts();
         }
 
         if (answers.action === "Add a department") {
             departments.push(answers.deptName);
-            console.log(`You created '${departmentName}'`)
             addDepartment();
         }
 
         if (answers.action === "Delete a department") {
             deleteDepartment();
-            console.log(`You deleted '${deletedDepartmentName}'`)
         }
 
         if (answers.action === "EXIT") {
             console.log("DONE!");
         };
-
-        if (answers.continue === true) {
-            askQuestions();
-        } else {
-            connection.end();
-        };
     });
 };
 
 
-function getDepartments() {
+async function getDepartments() {
     connection.query(`SELECT dept_name FROM companydb.departments;`, function (err, res) {
         if (err) throw err;
         for (var i = 0; i < res.length; i++) {
@@ -204,7 +224,8 @@ function viewAllEmployees() {
     INNER JOIN managers ON managers.id = employees.manager_id`, function (err, res) {
         if (err) throw err;
         console.table(res);
-        connection.end();
+        advancePrompts();
+        // connection.end();
     });
 };
 
@@ -217,7 +238,8 @@ function viewEmployeesByDepartment() {
     WHERE departments.dept_name = "${departmentChoice}";`, function (err, res) {
         if (err) throw err;
         console.table(res);
-        connection.end();
+        advancePrompts();
+        // connection.end();
     });
 }
 
@@ -225,6 +247,7 @@ function addDepartment() {
     connection.query(`INSERT INTO departments (id, dept_name)
     VALUES (${departmentID}, "${departmentName}");`, function (err, res) {
         if (err) throw err;
+        advancePrompts();
     });
 }
 
@@ -232,6 +255,7 @@ function deleteDepartment() {
     connection.query(`DELETE FROM departments
     WHERE dept_name = "${deletedDepartmentName}";`, function (err, res) {
         if (err) throw err;
+        advancePrompts();
     });
 }
 
