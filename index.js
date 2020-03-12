@@ -15,6 +15,7 @@ var connection = mysql.createConnection({
 connection.connect((err) => {
     if (err) throw err;
     console.log("connected as id " + connection.threadId + "\n");
+    console.log(appName);
     getDepartments();
     getRoles();
     getManagers();
@@ -40,7 +41,7 @@ const questions = [
         type: "list",
         name: "action",
         message: "What would you like to do?",
-        choices: ["View all employees", "View employees by department", "View employees by manager", "View departments", "Add a department", "Delete a department", "Add a role", "Update a role", "Add an employee", "Update an employee", "EXIT"]
+        choices: ["View all employees", "View employees by department", "View employees by manager", "View departments", "Add a department", "Delete a department", "Add a role", "Update a role", "Add an employee", "Update an employee", "View budgets", "EXIT"]
     },
     {
         type: "list",
@@ -395,7 +396,7 @@ function askQuestions() {
         };
 
         if (answers.action === "EXIT") {
-            console.log("DONE!");
+            console.log("GOODBYE...");
             connection.end();
         };
     });
@@ -512,6 +513,36 @@ async function getInfo() {
     askQuestions();
 };
 
+const appName=`
+             xxxxxxxxxxxxxxxx   xxxxxxxxxxxxxxxx        xxxxxx         xxx          xxx      
+                   xx           xx                    xx      xx       xxxx        xxxx
+                   xx           xx                   xx        xx      xx  x      x  xx
+                   xx           xx                  xx          xx     xx   x    x   xx
+                   xx           xxxxxxxxxxxxxxxx   xxxxxxxxxxxxxxxx    xx    xxxx    xx
+                   xx           xx                 xx            xx    xx     xx     xx
+                   xx           xx                 xx            xx    xx     xx     xx                       
+                   xx           xx                 xx            xx    xx     xx     xx                      
+                   xx           xxxxxxxxxxxxxxxx   xx            xx    xx     xx     xx
+                   
+                                                                                                             xxxx
+                                                                                                            xxxxxx
+                                                                                                              xx
+             xxxxxxxxxxxxxxxx   xxxxxxxxxxxxx          xxxxxxxx        xxxxxxxxxxxxxxxx    xx          xx    x      xxxxxxxxxxxxx 
+                   xx           xx          xx       xx        xx      xx                  xx        xx             xx          xx
+                   xx           xx           xx     xx          xx     xx                  xx      xx               xx           xx
+                   xx           xx          xx     xx            xx    xx                  xx    xx                 xx          xx
+                   xx           xxxxxxxxxxxx       xxxxxxxxxxxxxxxx    xx                  xxxxxxx                   xxxxxxxxxxxx
+                   xx           xx        xx       xx            xx    xx                  xx    xx                 xx        xx
+                   xx           xx          xx     xx            xx    xx                  xx      xx               xx          xx
+                   xx           xx           xx    xx            xx    xx                  xx        xx             xx           xx
+                   xx           xx            xx   xx            xx    xxxxxxxxxxxxxxx     xx          xx           xx            xx
+
+                   
+
+
+
+
+`;
 
 function updateFullName() {
     connection.query(`UPDATE employees
