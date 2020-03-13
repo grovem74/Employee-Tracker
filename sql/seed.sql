@@ -54,4 +54,8 @@ UPDATE employees
 Set full_name = CONCAT(first_name, "  ", last_name);
 
 UPDATE managers
+<<<<<<< HEAD
 Set mgr_full_name = CONCAT(mgr_first_name, "  ", mgr_last_name)
+=======
+Set full_name = CONCAT(mgr_first_name, "  ", mgr_last_name)
+>>>>>>> e95ebf03967abc2f38f864ce97d9845c78e17e17
