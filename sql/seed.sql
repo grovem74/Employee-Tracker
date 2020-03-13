@@ -1,44 +1,57 @@
-DROP DATABASE IF EXISTS companyDB;
+INSERT INTO departments (id, dept_name)
+VALUES (11, "R&D");
 
-CREATE DATABASE companyDB;
+INSERT INTO departments (id, dept_name)
+VALUES (37, "Human Resources");
 
-USE companyDB;
+INSERT INTO departments (id, dept_name)
+VALUES (93, "Finance");
 
-CREATE TABLE departments
-(
-    id INT,
-    dept_name VARCHAR(30) NOT NULL,
-    PRIMARY KEY(id)
-);
+INSERT INTO departments (id, dept_name)
+VALUES (67, "Customer Service");
 
-CREATE TABLE roles
-(
-    id INT,
-    title VARCHAR(30),
-    salary DECIMAL NOT NULL,
-    dept_id INT NOT NULL,
-    PRIMARY KEY(id),
-    FOREIGN KEY (dept_id) REFERENCES departments (id)
-);
 
-CREATE TABLE managers
-(
-    id INT,
-    mgr_first_name VARCHAR(30) NOT NULL,
-    mgr_last_name VARCHAR(30) NOT NULL,
-    role_id INT NOT NULL,
-    PRIMARY KEY(id)
-);
+INSERT INTO roles (id, title, salary, dept_id)
+VALUES (4944, "HR Rep", 63000, 37);
 
-CREATE TABLE employees
-(
-    id INT,
-    first_name VARCHAR(30) NOT NULL,
-    last_name VARCHAR(30) NOT NULL,
-    role_id INT NOT NULL,
-    manager_id INT,
-    full_name VARCHAR(50),
-    PRIMARY KEY(id),
-    FOREIGN KEY (role_id) REFERENCES roles (id),
-    FOREIGN KEY (manager_id) REFERENCES managers (id)
-);
+INSERT INTO roles (id, title, salary, dept_id)
+VALUES (3898, "Analyst", 55000, 93);
+
+INSERT INTO roles (id, title, salary, dept_id)
+VALUES (2946, "Customer Service Rep", 48000, 67);
+
+INSERT INTO roles (id, title, salary, dept_id)
+VALUES (6794, "Human Resources Manager", 65000, 37);
+
+INSERT INTO roles (id, title, salary, dept_id)
+VALUES (7813, "Finance Manager", 65000, 93);
+
+INSERT INTO roles (id, title, salary, dept_id)
+VALUES (2701, "Customer Service Manager", 65000, 67);
+
+
+INSERT INTO managers (id, mgr_first_name, mgr_last_name, role_id)
+VALUES (284662, "Fred", "Thompson", 6794 );
+
+INSERT INTO managers (id, mgr_first_name, mgr_last_name, role_id)
+VALUES (329569, "Julia", "Fuego", 7813);
+
+INSERT INTO managers (id, mgr_first_name, mgr_last_name, role_id)
+VALUES (103645, "Sammy", "Lynn", 2701);
+
+
+INSERT INTO employees (id, first_name, last_name, role_id, manager_id)
+VALUES (265583, "Jessica", "Long", 2946, 103645);
+
+INSERT INTO employees (id, first_name, last_name, role_id, manager_id)
+VALUES (146395, "Mia", "Johnson", 3898, 329569);
+
+INSERT INTO employees (id, first_name, last_name, role_id, manager_id)
+VALUES (825469, "Mike", "Lewis", 4944, 284662);
+
+
+UPDATE employees
+Set full_name = CONCAT(first_name, "  ", last_name);
+
+UPDATE managers
+Set full_name = CONCAT(mgr_first_name, "  ", mgr_last_name)

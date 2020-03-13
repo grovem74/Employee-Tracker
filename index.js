@@ -189,8 +189,8 @@ const questions = [
     },
     {
         type: "list",
-        name: "employeeRoleID",
-        message: "Select a role ID:",
+        name: "employeeRole",
+        message: "Select a role:",
         choices: roles,
         when: function (answers) {
             return answers.action === "Add an employee";
@@ -289,10 +289,10 @@ async function getDepartments() {
 };
 
 function getRoles() {
-    connection.query(`SELECT id FROM companydb.roles;`, function (err, res) {
+    connection.query(`SELECT title FROM companydb.roles;`, function (err, res) {
         if (err) throw err;
         for (var i = 0; i < res.length; i++) {
-            roles.push(res[i].id);
+            roles.push(res[i].title);
         }
     })
 };
@@ -333,7 +333,8 @@ function askQuestions() {
         departmentID = answers.deptID;
         departmentChoice = answers.deptChoice;
         employeeID = answers.employeeID;
-        employeeRoleID = answers.employeeRoleID;
+        employeeRole = answers.employeeRole;
+        employeeRoleID = "";
         employeeManagerID = answers.employeeManagerID;
         fname = answers.fname;
         lname = answers.lname;
@@ -393,6 +394,10 @@ function askQuestions() {
             } else {
                 deleteEmployee();
             };
+        };
+
+        if (answers.action === "View budgets") {
+            viewBudgets();
         };
 
         if (answers.action === "EXIT") {
@@ -507,6 +512,9 @@ function deleteEmployee() {
         updateFullName();
         advancePrompts();
     });
+};
+
+function viewBudgets() {
 };
 
 async function getInfo() {
