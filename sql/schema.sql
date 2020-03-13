@@ -24,7 +24,10 @@ CREATE TABLE roles
 CREATE TABLE managers
 (
     id INT,
-    manager_name VARCHAR(30) NOT NULL,
+    mgr_first_name VARCHAR(30) NOT NULL,
+    mgr_last_name VARCHAR(30) NOT NULL,
+    role_id INT NOT NULL,
+    mgr_full_name VARCHAR(50),
     PRIMARY KEY(id)
 );
 
@@ -35,7 +38,9 @@ CREATE TABLE employees
     last_name VARCHAR(30) NOT NULL,
     role_id INT NOT NULL,
     manager_id INT,
+    full_name VARCHAR(50),
     PRIMARY KEY(id),
     FOREIGN KEY (role_id) REFERENCES roles (id),
     FOREIGN KEY (manager_id) REFERENCES managers (id)
 );
+

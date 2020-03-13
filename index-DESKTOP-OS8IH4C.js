@@ -43,7 +43,7 @@ const questions = [
         type: "list",
         name: "action",
         message: "What would you like to do?",
-        choices: ["View employees", "View employees by department", "View employees by manager", "View Managers", "View departments", "Add a department", "Delete a department", "Add a role", "Update a role", "Add an employee", "Update an employee", "View budgets", "EXIT"]
+        choices: ["View all employees", "View employees by department", "View employees by manager", "View departments", "Add a department", "Delete a department", "Add a role", "Update a role", "Add an employee", "Update an employee", "View budgets", "EXIT"]
     },
     {
         type: "list",
@@ -191,7 +191,7 @@ const questions = [
     },
     {
         type: "list",
-        name: "employeeRoleID",
+        name: "employeeRole",
         message: "Select a role:",
         choices: roleIDs,
         when: function (answers) {
@@ -242,19 +242,17 @@ const questions = [
         }
     },
     {
-        type: "list",
+        type: "input",
         name: "updatedEmployeeRoleID",
         message: "Update employee's role ID:",
-        choices: roleIDs,
         when: function (answers) {
             return answers.employeeUpdateChoice === "Update";
         }
     },
     {
-        type: "list",
+        type: "input",
         name: "updatedEmployeeManagerID",
         message: "Update employee's manager ID:",
-        choices: managerIDs,
         when: function (answers) {
             return answers.employeeUpdateChoice === "Update";
         }
@@ -339,7 +337,7 @@ function askQuestions() {
         departmentChoice = answers.deptChoice;
         employeeID = answers.employeeID;
         employeeRole = answers.employeeRole;
-        employeeRoleID = answers.employeeRoleID;
+        employeeRoleID = "";
         employeeManagerID = answers.employeeManagerID;
         fname = answers.fname;
         lname = answers.lname;
@@ -349,8 +347,8 @@ function askQuestions() {
         updatedEmployeeRoleID = answers.updatedEmployeeRoleID;
         updatedEmployeeManagerID = answers.updatedEmployeeManagerID;
 
-        if (answers.action === "View employees") {
-            viewEmployees();
+        if (answers.action === "View all employees") {
+            viewAllEmployees();
         };
 
         if (answers.action === "View employees by department") {
@@ -359,10 +357,6 @@ function askQuestions() {
 
         if (answers.action === "View employees by manager") {
             viewEmployeesByManager();
-        };
-
-        if (answers.action === "View Managers") {
-            viewManagers();
         };
 
         if (answers.action === "View departments") {
@@ -416,12 +410,12 @@ function askQuestions() {
     });
 };
 
-function viewEmployees() {
-    connection.query(`SELECT employees.id AS Employee_ID, employees.first_name AS First_Name, employees.last_name AS Last_Name, roles.title AS Title, departments.dept_name AS Department, roles.salary AS Salary, managers.mgr_full_name AS Manager 
-    FROM employees
-    INNER JOIN roles ON roles.id = employees.role_id
-    INNER JOIN managers ON managers.id = employees.manager_id
-    INNER JOIN departments ON departments.id = roles.dept_id`, function (err, res) {
+function viewAllEmployees() {
+    connection.query(`SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.dept_name, roles.salary, managers.mgr_first_name
+    FROM departments
+    INNER JOIN roles ON roles.dept_id = departments.id
+    INNER JOIN employees ON employees.role_id = roles.id
+    INNER JOIN managers ON managers.id = employees.manager_id`, function (err, res) {
         if (err) throw err;
         console.table(res);
         advancePrompts();
@@ -448,17 +442,6 @@ function viewEmployeesByManager() {
     INNER JOIN employees ON employees.role_id = roles.id
     INNER JOIN managers ON managers.id = employees.manager_id
     WHERE managers.mgr_last_name = "${managerChoice}";`, function (err, res) {
-        if (err) throw err;
-        console.table(res);
-        advancePrompts();
-    });
-};
-
-function viewManagers() {
-    connection.query(`SELECT managers.id AS Manager_ID, managers.mgr_full_name AS Manager_Name, departments.dept_name AS Department
-    FROM managers
-    INNER JOIN roles ON roles.id = managers.role_id
-    INNER JOIN departments ON departments.id = roles.dept_id`, function (err, res) {
         if (err) throw err;
         console.table(res);
         advancePrompts();
@@ -508,7 +491,7 @@ function deleteRole() {
 
 function addEmployee() {
     connection.query(`INSERT INTO employees (id, first_name, last_name, role_id, manager_id)
-    VALUES (${employeeID}, "${fname}", "${lname}", ${employeeRoleID}, ${employeeManagerID});`, function (err, res) {
+    VALUES (${employeeID}, "${fname}", "${lname}", ${employeeRole_ID}, ${employeeManagerID});`, function (err, res) {
         if (err) throw err;
         updateFullName();
         advancePrompts();
