@@ -43,7 +43,7 @@ const questions = [
         type: "list",
         name: "action",
         message: "What would you like to do?",
-        choices: ["View Employees", "View Employees By Department", "View Employees By Manager", "View Managers", "View Departments", "Add Department", "Delete Department", "Add Role", "Update Role", "Add Employee", "Update Employee", "View budgets", "EXIT"]
+        choices: ["View Employees", "View Employees By Department", "View Employees By Manager", "View Managers", "View Departments", "Add Department", "Delete Department", "View Roles", "Add Role", "Update Role", "Add Employee", "Update Employee", "View budgets", "EXIT"]
     },
     {
         type: "list",
@@ -370,6 +370,10 @@ function askQuestions() {
             viewDepartments();
         };
 
+        if (answers.action === "View Roles") {
+            viewRoles();
+        };
+
         if (answers.action === "Add Department") {
             departments.push(answers.deptName);
             addDepartment();
@@ -415,12 +419,12 @@ function askQuestions() {
 };
 
 function viewEmployees() {
-    connection.query(`SELECT managers.id AS ID, mgr_full_name AS NAME, roles.title AS TITLE, dept_name AS DEPARTMENT, salary AS SALARY, "NA" AS MANAGER FROM managers
+    connection.query(`SELECT managers.id AS ID, mgr_full_name AS NAME, roles.title AS ROLE, dept_name AS DEPARTMENT, salary AS SALARY, "NA" AS MANAGER FROM managers
     INNER JOIN employees ON employees.manager_id = managers.id
     INNER JOIN roles ON roles.id = managers.role_id
     INNER JOIN departments ON departments.id = roles.dept_id
     UNION
-    SELECT employees.id AS ID, full_name AS NAME, roles.title AS TITLE, dept_name AS DEPARTMENT, salary AS SALARY, mgr_full_name AS MANAGER FROM employees
+    SELECT employees.id AS ID, full_name AS NAME, roles.title AS ROLE, dept_name AS DEPARTMENT, salary AS SALARY, mgr_full_name AS MANAGER FROM employees
     INNER JOIN roles ON roles.id = employees.role_id
     INNER JOIN managers ON managers.id = employees.manager_id
     INNER JOIN departments ON departments.id = roles.dept_id
@@ -432,7 +436,7 @@ function viewEmployees() {
 };
 
 function viewEmployeesByDepartment() {
-    connection.query(`SELECT employees.id AS ID, employees.full_name AS NAME, roles.title AS TITLE, departments.dept_name AS DEPARTMENT, roles.salary AS SALARY, managers.mgr_full_name AS MANAGER
+    connection.query(`SELECT employees.id AS ID, employees.full_name AS NAME, roles.title AS ROLE, departments.dept_name AS DEPARTMENT, roles.salary AS SALARY, managers.mgr_full_name AS MANAGER
     FROM (((departments
     INNER JOIN roles ON roles.dept_id = departments.id)
     INNER JOIN employees ON employees.role_id = roles.id)
@@ -445,7 +449,7 @@ function viewEmployeesByDepartment() {
 };
 
 function viewEmployeesByManager() {
-    connection.query(`SELECT employees.id AS ID, employees.full_name AS NAME, roles.title AS TITLE, departments.dept_name AS DEPARTMENT, roles.salary AS SALARY
+    connection.query(`SELECT employees.id AS ID, employees.full_name AS NAME, roles.title AS ROLE, departments.dept_name AS DEPARTMENT, roles.salary AS SALARY
     FROM departments
     INNER JOIN roles ON roles.dept_id = departments.id
     INNER JOIN employees ON employees.role_id = roles.id
@@ -470,6 +474,15 @@ function viewManagers() {
 
 function viewDepartments() {
     connection.query(`SELECT departments.id AS ID, departments.dept_name AS DEPARTMENT FROM companydb.departments;`, function (err, res) {
+        if (err) throw err;
+        console.table(res);
+        advancePrompts();
+    });
+};
+
+function viewRoles() {
+    connection.query(`SELECT roles.id AS ID, roles.title AS ROLE, roles.salary AS SALARY, departments.dept_name AS DEPARTMENT FROM companydb.departments
+	INNER JOIN roles ON roles.dept_id = departments.id`, function (err, res) {
         if (err) throw err;
         console.table(res);
         advancePrompts();
