@@ -2,6 +2,7 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 var consoletable = require("console.table");
+var colors = require("colors");
 
 // SQL set up
 var connection = mysql.createConnection({
@@ -15,7 +16,7 @@ var connection = mysql.createConnection({
 connection.connect((err) => {
     if (err) throw err;
     console.log("connected as id " + connection.threadId + "\n");
-    console.log(appName);
+    console.log(appName.green);
     getDepartments();
     getRoles();
     getManagers();
@@ -43,7 +44,7 @@ const questions = [
         type: "list",
         name: "action",
         message: "What would you like to do?",
-        choices: ["View Employees", "View Employees By Department", "View Employees By Manager", "View Managers", "View Departments", "Add Department", "Delete Department", "View Roles", "Add Role", "Update Role", "Add Employee", "Update Employee", "View Budgets", "EXIT"]
+        choices: ["View Employees", "View Employees By Department", "View Employees By Manager", "View Managers", "View Departments", "Add Department", "Delete Department".red, "View Roles", "Add Role", "Update Role", "Add Employee", "Update Employee", "View Budgets", "EXIT".red]
     },
     {
         type: "list",
@@ -136,7 +137,7 @@ const questions = [
         type: "list",
         name: "roleUpdateChoice",
         message: "Select an action:",
-        choices: ["Update", "Delete"],
+        choices: ["Update", "Delete".red],
         when: function (answers) {
             return answers.action === "Update Role";
         }
@@ -221,7 +222,7 @@ const questions = [
         type: "list",
         name: "employeeUpdateChoice",
         message: "Select an action:",
-        choices: ["Update", "Delete"],
+        choices: ["Update", "Delete".red],
         when: function (answers) {
             return answers.action === "Update Employee";
         }
@@ -419,12 +420,12 @@ function askQuestions() {
 };
 
 function viewEmployees() {
-    connection.query(`SELECT managers.id AS ID, mgr_full_name AS NAME, roles.title AS ROLE, dept_name AS DEPARTMENT, salary AS SALARY, "NA" AS MANAGER FROM managers
+    connection.query(`SELECT managers.id AS ID, mgr_full_name AS NAME, roles.title AS ROLE, dept_name AS DEPARTMENT, CONCAT('$', FORMAT(salary, "C")) AS SALARY, "NA" AS MANAGER FROM managers
     INNER JOIN employees ON employees.manager_id = managers.id
     INNER JOIN roles ON roles.id = managers.role_id
     INNER JOIN departments ON departments.id = roles.dept_id
     UNION
-    SELECT employees.id AS ID, full_name AS NAME, roles.title AS ROLE, dept_name AS DEPARTMENT, salary AS SALARY, mgr_full_name AS MANAGER FROM employees
+    SELECT employees.id AS ID, full_name AS NAME, roles.title AS ROLE, dept_name AS DEPARTMENT, CONCAT('$', FORMAT(salary, "C")) AS SALARY, mgr_full_name AS MANAGER FROM employees
     INNER JOIN roles ON roles.id = employees.role_id
     INNER JOIN managers ON managers.id = employees.manager_id
     INNER JOIN departments ON departments.id = roles.dept_id
@@ -436,7 +437,7 @@ function viewEmployees() {
 };
 
 function viewEmployeesByDepartment() {
-    connection.query(`SELECT employees.id AS ID, employees.full_name AS NAME, roles.title AS ROLE, departments.dept_name AS DEPARTMENT, roles.salary AS SALARY, managers.mgr_full_name AS MANAGER
+    connection.query(`SELECT employees.id AS ID, employees.full_name AS NAME, roles.title AS ROLE, departments.dept_name AS DEPARTMENT, CONCAT('$', FORMAT(salary, "C")) AS SALARY, managers.mgr_full_name AS MANAGER
     FROM (((departments
     INNER JOIN roles ON roles.dept_id = departments.id)
     INNER JOIN employees ON employees.role_id = roles.id)
@@ -449,7 +450,7 @@ function viewEmployeesByDepartment() {
 };
 
 function viewEmployeesByManager() {
-    connection.query(`SELECT employees.id AS ID, employees.full_name AS NAME, roles.title AS ROLE, departments.dept_name AS DEPARTMENT, roles.salary AS SALARY
+    connection.query(`SELECT employees.id AS ID, employees.full_name AS NAME, roles.title AS ROLE, departments.dept_name AS DEPARTMENT, CONCAT('$', FORMAT(salary, "C")) AS SALARY
     FROM departments
     INNER JOIN roles ON roles.dept_id = departments.id
     INNER JOIN employees ON employees.role_id = roles.id
@@ -481,7 +482,7 @@ function viewDepartments() {
 };
 
 function viewRoles() {
-    connection.query(`SELECT roles.id AS ID, roles.title AS ROLE, roles.salary AS SALARY, departments.dept_name AS DEPARTMENT FROM companydb.departments
+    connection.query(`SELECT roles.id AS ID, roles.title AS ROLE, CONCAT('$', FORMAT(salary, "C")) AS SALARY, departments.dept_name AS DEPARTMENT FROM companydb.departments
 	INNER JOIN roles ON roles.dept_id = departments.id`, function (err, res) {
         if (err) throw err;
         console.table(res);
@@ -584,36 +585,41 @@ async function getInfo() {
     askQuestions();
 };
 
-const appName = `
-             xxxxxxxxxxxxxxxx   xxxxxxxxxxxxxxxx        xxxxxx         xxx          xxx      
-                   xx           xx                    xx      xx       xxxx        xxxx
-                   xx           xx                   xx        xx      xx  x      x  xx
-                   xx           xx                  xx          xx     xx   x    x   xx
-                   xx           xxxxxxxxxxxxxxxx   xxxxxxxxxxxxxxxx    xx    xxxx    xx
-                   xx           xx                 xx            xx    xx     xx     xx
-                   xx           xx                 xx            xx    xx     xx     xx                       
-                   xx           xx                 xx            xx    xx     xx     xx                      
-                   xx           xxxxxxxxxxxxxxxx   xx            xx    xx     xx     xx
-                   
-                                                                                                             xxxx
-                                                                                                            xxxxxx
-                                                                                                              xx
-             xxxxxxxxxxxxxxxx   xxxxxxxxxxxxx          xxxxxxxx        xxxxxxxxxxxxxxxx    xx          xx    x      xxxxxxxxxxxxx 
-                   xx           xx          xx       xx        xx      xx                  xx        xx             xx          xx
-                   xx           xx           xx     xx          xx     xx                  xx      xx               xx           xx
-                   xx           xx          xx     xx            xx    xx                  xx    xx                 xx          xx
-                   xx           xxxxxxxxxxxx       xxxxxxxxxxxxxxxx    xx                  xxxxxxx                   xxxxxxxxxxxx
-                   xx           xx        xx       xx            xx    xx                  xx    xx                 xx        xx
-                   xx           xx          xx     xx            xx    xx                  xx      xx               xx          xx
-                   xx           xx           xx    xx            xx    xx                  xx        xx             xx           xx
-                   xx           xx            xx   xx            xx    xxxxxxxxxxxxxxx     xx          xx           xx            xx
-
-                   
-
-
-
-
-`;
+const appName =`
+TTTTTTTTTTTTTTTTTTTTTTT                                                                                                                             
+T:::::::::::::::::::::T                                                                              ,@&@&@@* 
+T:::::::::::::::::::::T                                                                             &........@ 
+T:::::TT:::::::TT:::::T                                                                             @........& 
+TTTTTT  T:::::T  TTTTTTeeeeeeeeeeee    aaaaaaaaaaaaa      mmmmmmm    mmmmmmm                        ,........,
+        T:::::T      ee::::::::::::ee  a::::::::::::a   mm:::::::m  m:::::::mm                       .......                           
+        T:::::T     e::::::eeeee:::::eeaaaaaaaaa:::::a m::::::::::mm::::::::::m                      % .,.. %                             
+        T:::::T    e::::::e     e:::::e         a::::a m::::::::::::::::::::::m                   &&&%,./* (@&&&                               
+        T:::::T    e:::::::eeeee::::::e  aaaaaaa:::::a m:::::mmm::::::mmm:::::m                  &&&&%  /  (%&&&&                               
+        T:::::T    e:::::::::::::::::e aa::::::::::::a m::::m   m::::m   m::::m                 &&&&&%  // (&&&&&                                
+        T:::::T    e::::::eeeeeeeeeee a::::aaaa::::::a m::::m   m::::m   m::::m                 &&&&&&  // #&&&&&                                
+        T:::::T    e:::::::e         a::::a    a:::::a m::::m   m::::m   m::::m                 &&&@&&, (. #&&@&&,                                
+      TT:::::::TT  e::::::::e        a::::a    a:::::a m::::m   m::::m   m::::m                  ,&@&&@&&&&@&&@&(/                                 
+      T:::::::::T   e::::::::eeeeeeeea:::::aaaa::::::a m::::m   m::::m   m::::m                 , . &&&&%&&&&& ./.                                 
+      T:::::::::T    ee:::::::::::::e a::::::::::aa:::am::::m   m::::m   m::::m                     &&&&(&&&&&%&&%%                             
+      TTTTTTTTTTT      eeeeeeeeeeeeee  aaaaaaaaaa  aaaammmmmm   mmmmmm   mmmmmm                     &&&&*&&&&&%#&%%
+                                                                                                    &&&&.&&&&&%#%%%
+TTTTTTTTTTTTTTTTTTTTTTT                                                       kkkkkkkk              &&&&.&&&&&                             
+T:::::::::::::::::::::T                                                       k::::::k              %%#& &&&&&                             
+T:::::::::::::::::::::T                                                       k::::::k           &&&&&&& &&&&&&&                                 
+T:::::TT:::::::TT:::::T                                                       k::::::k                                                
+TTTTTT  T:::::T  TTTTTTrrrrr   rrrrrrrrr   aaaaaaaaaaaaa      cccccccccccccccc k:::::k    kkkkkkk eeeeeeeeeeee    rrrrr   rrrrrrrrr   
+        T:::::T        r::::rrr:::::::::r  a::::::::::::a   cc:::::::::::::::c k:::::k   k:::::kee::::::::::::ee  r::::rrr:::::::::r  
+        T:::::T        r:::::::::::::::::r aaaaaaaaa:::::a c:::::::::::::::::c k:::::k  k:::::ke::::::eeeee:::::eer:::::::::::::::::r 
+        T:::::T        rr::::::rrrrr::::::r         a::::ac:::::::cccccc:::::c k:::::k k:::::ke::::::e     e:::::err::::::rrrrr::::::r
+        T:::::T         r:::::r     r:::::r  aaaaaaa:::::ac::::::c     ccccccc k::::::k:::::k e:::::::eeeee::::::e r:::::r     r:::::r
+        T:::::T         r:::::r     rrrrrrraa::::::::::::ac:::::c              k:::::::::::k  e:::::::::::::::::e  r:::::r     rrrrrrr
+        T:::::T         r:::::r           a::::aaaa::::::ac:::::c              k:::::::::::k  e::::::eeeeeeeeeee   r:::::r            
+        T:::::T         r:::::r          a::::a    a:::::ac::::::c     ccccccc k::::::k:::::k e:::::::e            r:::::r            
+      TT:::::::TT       r:::::r          a::::a    a:::::ac:::::::cccccc:::::ck::::::k k:::::ke::::::::e           r:::::r            
+      T:::::::::T       r:::::r          a:::::aaaa::::::a c:::::::::::::::::ck::::::k  k:::::ke::::::::eeeeeeee   r:::::r            
+      T:::::::::T       r:::::r           a::::::::::aa:::a cc:::::::::::::::ck::::::k   k:::::kee:::::::::::::e   r:::::r            
+      TTTTTTTTTTT       rrrrrrr            aaaaaaaaaa  aaaa   cccccccccccccccckkkkkkkk    kkkkkkk eeeeeeeeeeeeee   rrrrrrr
+`
 
 function updateFullName() {
     connection.query(`UPDATE employees
