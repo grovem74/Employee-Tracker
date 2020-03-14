@@ -43,7 +43,7 @@ const questions = [
         type: "list",
         name: "action",
         message: "What would you like to do?",
-        choices: ["View Employees", "View Employees By Department", "View Employees By Manager", "View Managers", "View Departments", "Add Department", "Delete Department", "View Roles", "Add Role", "Update Role", "Add Employee", "Update Employee", "View budgets", "EXIT"]
+        choices: ["View Employees", "View Employees By Department", "View Employees By Manager", "View Managers", "View Departments", "Add Department", "Delete Department", "View Roles", "Add Role", "Update Role", "Add Employee", "Update Employee", "View Budgets", "EXIT"]
     },
     {
         type: "list",
@@ -407,7 +407,7 @@ function askQuestions() {
             };
         };
 
-        if (answers.action === "View budgets") {
+        if (answers.action === "View Budgets") {
             viewBudgets();
         };
 
@@ -516,7 +516,7 @@ function addRole() {
 function updateRole() {
     connection.query(`UPDATE roles
     SET title = "${updatedTitle}", salary = ${updatedSalary}
-    WHERE title = "${updatedRole}";`, function (err, res) {  
+    WHERE title = "${updatedRole}";`, function (err, res) {
         if (err) throw err;
         advancePrompts();
     });
@@ -559,13 +559,32 @@ function deleteEmployee() {
 };
 
 function viewBudgets() {
+    connection.query(`SELECT roles.id AS ID, dept_name AS DEPARTMENT, CONCAT('$', FORMAT(SUM(salary), "C")) AS BUDGET, COUNT(dept_name) AS EMPLOYEES FROM companydb.departments 
+    INNER JOIN roles ON roles.dept_id = departments.id
+    WHERE departments.dept_name = "Customer Service"
+    UNION
+    SELECT roles.id AS ID, dept_name AS DEPARTMENT, CONCAT('$', FORMAT(SUM(salary), "C")) AS BUDGET, COUNT(dept_name) AS EMPLOYEES FROM companydb.departments 
+    INNER JOIN roles ON roles.dept_id = departments.id
+    WHERE departments.dept_name = "Finance"
+    UNION
+    SELECT roles.id AS ID, dept_name AS DEPARTMENT, CONCAT('$', FORMAT(SUM(salary), "C")) AS BUDGET, COUNT(dept_name) AS EMPLOYEES FROM companydb.departments 
+    INNER JOIN roles ON roles.dept_id = departments.id
+    WHERE departments.dept_name = "R&D"
+    UNION
+    SELECT roles.id AS ID, dept_name AS DEPARTMENT, CONCAT('$', FORMAT(SUM(salary), "C")) AS BUDGET, COUNT(dept_name) AS EMPLOYEES FROM companydb.departments 
+    INNER JOIN roles ON roles.dept_id = departments.id
+    WHERE departments.dept_name = "Human Resources";`, function (err, res) {
+        if (err) throw err;
+        console.table(res);
+        advancePrompts();
+    });
 };
 
 async function getInfo() {
     askQuestions();
 };
 
-const appName=`
+const appName = `
              xxxxxxxxxxxxxxxx   xxxxxxxxxxxxxxxx        xxxxxx         xxx          xxx      
                    xx           xx                    xx      xx       xxxx        xxxx
                    xx           xx                   xx        xx      xx  x      x  xx
@@ -598,7 +617,7 @@ const appName=`
 
 function updateFullName() {
     connection.query(`UPDATE employees
-    SET full_name = CONCAT(first_name, "-", last_name);`, function (err, res) {
+    SET full_name = CONCAT(first_name, " ", last_name);`, function (err, res) {
         if (err) throw err;
     })
 };
