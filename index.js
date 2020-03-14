@@ -43,7 +43,7 @@ const questions = [
         type: "list",
         name: "action",
         message: "What would you like to do?",
-        choices: ["View employees", "View employees by department", "View employees by manager", "View Managers", "View departments", "Add a department", "Delete a department", "Add a role", "Update a role", "Add an employee", "Update an employee", "View budgets", "EXIT"]
+        choices: ["View Employees", "View Employees By Department", "View Employees By Manager", "View Managers", "View Departments", "Add Department", "Delete Department", "Add Role", "Update Role", "Add Employee", "Update Employee", "View budgets", "EXIT"]
     },
     {
         type: "list",
@@ -51,7 +51,7 @@ const questions = [
         message: "Select a department:",
         choices: departments,
         when: function (answers) {
-            return answers.action === "View employees by department";
+            return answers.action === "View Employees By Department";
         }
     },
     {
@@ -60,7 +60,7 @@ const questions = [
         message: "Select a manager:",
         choices: managers,
         when: function (answers) {
-            return answers.action === "View employees by manager";
+            return answers.action === "View Employees By Manager";
         }
     },
     {
@@ -68,7 +68,7 @@ const questions = [
         name: "deptID",
         message: "Enter a department ID:",
         when: function (answers) {
-            return answers.action === "Add a department";
+            return answers.action === "Add Department";
         }
     },
     {
@@ -76,7 +76,7 @@ const questions = [
         name: "deptName",
         message: "Enter the department name:",
         when: function (answers) {
-            return answers.action === "Add a department";
+            return answers.action === "Add Department";
         }
     },
     {
@@ -85,7 +85,7 @@ const questions = [
         message: "Select department to delete:",
         choices: departments,
         when: function (answers) {
-            return answers.action === "Delete a department";
+            return answers.action === "Delete Department";
         }
     },
     {
@@ -94,7 +94,7 @@ const questions = [
         message: "Enter a new role ID:",
 
         when: function (answers) {
-            return answers.action === "Add a role";
+            return answers.action === "Add Role";
         }
     },
     {
@@ -103,7 +103,7 @@ const questions = [
         message: "Enter a title for the new role:",
 
         when: function (answers) {
-            return answers.action === "Add a role";
+            return answers.action === "Add Role";
         }
     },
     {
@@ -111,7 +111,7 @@ const questions = [
         name: "roleSalary",
         message: "Enter a salary for the new role:",
         when: function (answers) {
-            return answers.action === "Add a role";
+            return answers.action === "Add Role";
         }
     },
     {
@@ -120,7 +120,7 @@ const questions = [
         message: "Select a department ID for the new role:",
         choices: departmentIDs,
         when: function (answers) {
-            return answers.action === "Add a role";
+            return answers.action === "Add Role";
         }
     },
     {
@@ -129,7 +129,7 @@ const questions = [
         message: "Select a role:",
         choices: roles,
         when: function (answers) {
-            return answers.action === "Update a role";
+            return answers.action === "Update Role";
         }
     },
     {
@@ -138,7 +138,7 @@ const questions = [
         message: "Select an action:",
         choices: ["Update", "Delete"],
         when: function (answers) {
-            return answers.action === "Update a role";
+            return answers.action === "Update Role";
         }
     },
     {
@@ -158,9 +158,10 @@ const questions = [
         }
     },
     {
-        type: "input",
+        type: "list",
         name: "updateRoleDeptID",
         message: "Enter new department ID:",
+        choices: roleIDs,
         when: function (answers) {
             return answers.roleUpdateChoice === "Update";
         }
@@ -170,7 +171,7 @@ const questions = [
         name: "employeeID",
         message: "Enter new employee ID:",
         when: function (answers) {
-            return answers.action === "Add an employee";
+            return answers.action === "Add Employee";
         }
     },
     {
@@ -178,7 +179,7 @@ const questions = [
         name: "fname",
         message: "Enter the employee's first name:",
         when: function (answers) {
-            return answers.action === "Add an employee";
+            return answers.action === "Add Employee";
         }
     },
     {
@@ -186,7 +187,7 @@ const questions = [
         name: "lname",
         message: "Enter the employee's last name:",
         when: function (answers) {
-            return answers.action === "Add an employee";
+            return answers.action === "Add Employee";
         }
     },
     {
@@ -195,7 +196,7 @@ const questions = [
         message: "Select a role:",
         choices: roleIDs,
         when: function (answers) {
-            return answers.action === "Add an employee";
+            return answers.action === "Add Employee";
         }
     },
     {
@@ -204,7 +205,7 @@ const questions = [
         message: "Select a manager ID:",
         choices: managerIDs,
         when: function (answers) {
-            return answers.action === "Add an employee";
+            return answers.action === "Add Employee";
         }
     },
     {
@@ -213,7 +214,7 @@ const questions = [
         message: "Select an employee:",
         choices: employees,
         when: function (answers) {
-            return answers.action === "Update an employee";
+            return answers.action === "Update Employee";
         }
     },
     {
@@ -222,7 +223,7 @@ const questions = [
         message: "Select an action:",
         choices: ["Update", "Delete"],
         when: function (answers) {
-            return answers.action === "Update an employee";
+            return answers.action === "Update Employee";
         }
     },
     {
@@ -349,15 +350,15 @@ function askQuestions() {
         updatedEmployeeRoleID = answers.updatedEmployeeRoleID;
         updatedEmployeeManagerID = answers.updatedEmployeeManagerID;
 
-        if (answers.action === "View employees") {
+        if (answers.action === "View Employees") {
             viewEmployees();
         };
 
-        if (answers.action === "View employees by department") {
+        if (answers.action === "View Employees By Department") {
             viewEmployeesByDepartment();
         };
 
-        if (answers.action === "View employees by manager") {
+        if (answers.action === "View Employees By Manager") {
             viewEmployeesByManager();
         };
 
@@ -365,27 +366,24 @@ function askQuestions() {
             viewManagers();
         };
 
-        if (answers.action === "View departments") {
-            var list = departments.toString();
-            var splitList = list.split(",").join("\n");
-            console.log(`\nDEPARTMENTS\n-----------\n\n${splitList}\n`);
-            advancePrompts();
+        if (answers.action === "View Departments") {
+            viewDepartments();
         };
 
-        if (answers.action === "Add a department") {
+        if (answers.action === "Add Department") {
             departments.push(answers.deptName);
             addDepartment();
         };
 
-        if (answers.action === "Delete a department") {
+        if (answers.action === "Delete Department") {
             deleteDepartment();
         };
 
-        if (answers.action === "Add a role") {
+        if (answers.action === "Add Role") {
             addRole();
         };
 
-        if (answers.action === "Update a role") {
+        if (answers.action === "Update Role") {
             if (answers.roleUpdateChoice === "Update") {
                 updateRole();
             } else if (answers.roleUpdateChoice === "Delete") {
@@ -393,11 +391,11 @@ function askQuestions() {
             }
         };
 
-        if (answers.action === "Add an employee") {
+        if (answers.action === "Add Employee") {
             addEmployee();
         };
 
-        if (answers.action === "Update an employee") {
+        if (answers.action === "Update Employee") {
             if (answers.employeeUpdateChoice === "Update") {
                 updateEmployee();
             } else {
@@ -417,7 +415,7 @@ function askQuestions() {
 };
 
 function viewEmployees() {
-    connection.query(`SELECT employees.id AS Employee_ID, employees.first_name AS First_Name, employees.last_name AS Last_Name, roles.title AS Title, departments.dept_name AS Department, roles.salary AS Salary, managers.mgr_full_name AS Manager 
+    connection.query(`SELECT employees.id AS ID, employees.full_name AS NAME, roles.title AS TITLE, departments.dept_name AS DEPARTMENT, roles.salary AS SALARY, managers.mgr_full_name AS MANAGER 
     FROM employees
     INNER JOIN roles ON roles.id = employees.role_id
     INNER JOIN managers ON managers.id = employees.manager_id
@@ -429,7 +427,7 @@ function viewEmployees() {
 };
 
 function viewEmployeesByDepartment() {
-    connection.query(`SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.dept_name, roles.salary, managers.mgr_first_name, managers.mgr_last_name
+    connection.query(`SELECT employees.id AS ID, employees.full_name AS NAME, roles.title AS TITLE, departments.dept_name AS DEPARTMENT, roles.salary AS SALARY, managers.mgr_full_name AS MANAGER
     FROM (((departments
     INNER JOIN roles ON roles.dept_id = departments.id)
     INNER JOIN employees ON employees.role_id = roles.id)
@@ -442,7 +440,7 @@ function viewEmployeesByDepartment() {
 };
 
 function viewEmployeesByManager() {
-    connection.query(`SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.dept_name, roles.salary, managers.mgr_first_name, managers.mgr_last_name
+    connection.query(`SELECT employees.id AS ID, employees.full_name AS NAME, roles.title AS TITLE, departments.dept_name AS DEPARTMENT, roles.salary AS SALARY
     FROM departments
     INNER JOIN roles ON roles.dept_id = departments.id
     INNER JOIN employees ON employees.role_id = roles.id
@@ -455,10 +453,18 @@ function viewEmployeesByManager() {
 };
 
 function viewManagers() {
-    connection.query(`SELECT managers.id AS Manager_ID, managers.mgr_full_name AS Manager_Name, departments.dept_name AS Department
+    connection.query(`SELECT managers.id AS ID, managers.mgr_full_name AS NAME, departments.dept_name AS DEPARTMENT
     FROM managers
     INNER JOIN roles ON roles.id = managers.role_id
     INNER JOIN departments ON departments.id = roles.dept_id`, function (err, res) {
+        if (err) throw err;
+        console.table(res);
+        advancePrompts();
+    });
+};
+
+function viewDepartments() {
+    connection.query(`SELECT departments.id AS ID, departments.dept_name AS DEPARTMENT FROM companydb.departments;`, function (err, res) {
         if (err) throw err;
         console.table(res);
         advancePrompts();
@@ -491,8 +497,8 @@ function addRole() {
 
 function updateRole() {
     connection.query(`UPDATE roles
-    SET title = "${updatedTitle}", salary = "${updatedSalary}"
-    WHERE id = "${updatedRole}";`, function (err, res) {
+    SET title = "${updatedTitle}", salary = ${updatedSalary}
+    WHERE title = "${updatedRole}";`, function (err, res) {  
         if (err) throw err;
         advancePrompts();
     });
@@ -500,7 +506,7 @@ function updateRole() {
 
 function deleteRole() {
     connection.query(`DELETE FROM roles
-    WHERE id = ${updatedRole};`, function (err, res) {
+    WHERE title = "${updatedRole}";`, function (err, res) {
         if (err) throw err;
         advancePrompts();
     });

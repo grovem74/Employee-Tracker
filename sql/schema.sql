@@ -27,11 +27,7 @@ CREATE TABLE managers
     mgr_first_name VARCHAR(30) NOT NULL,
     mgr_last_name VARCHAR(30) NOT NULL,
     role_id INT NOT NULL,
-<<<<<<< HEAD:sql/schema.sql
     mgr_full_name VARCHAR(50),
-=======
-    full_name VARCHAR(50),
->>>>>>> e95ebf03967abc2f38f864ce97d9845c78e17e17:sql/companyDB.sql
     PRIMARY KEY(id)
 );
 
