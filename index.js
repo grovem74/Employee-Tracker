@@ -415,11 +415,16 @@ function askQuestions() {
 };
 
 function viewEmployees() {
-    connection.query(`SELECT employees.id AS ID, employees.full_name AS NAME, roles.title AS TITLE, departments.dept_name AS DEPARTMENT, roles.salary AS SALARY, managers.mgr_full_name AS MANAGER 
-    FROM employees
+    connection.query(`SELECT managers.id AS ID, mgr_full_name AS NAME, roles.title AS TITLE, dept_name AS DEPARTMENT, salary AS SALARY, "NA" AS MANAGER FROM managers
+    INNER JOIN employees ON employees.manager_id = managers.id
+    INNER JOIN roles ON roles.id = managers.role_id
+    INNER JOIN departments ON departments.id = roles.dept_id
+    UNION
+    SELECT employees.id AS ID, full_name AS NAME, roles.title AS TITLE, dept_name AS DEPARTMENT, salary AS SALARY, mgr_full_name AS MANAGER FROM employees
     INNER JOIN roles ON roles.id = employees.role_id
     INNER JOIN managers ON managers.id = employees.manager_id
-    INNER JOIN departments ON departments.id = roles.dept_id`, function (err, res) {
+    INNER JOIN departments ON departments.id = roles.dept_id
+    ORDER BY ID;`, function (err, res) {
         if (err) throw err;
         console.table(res);
         advancePrompts();
@@ -580,7 +585,7 @@ const appName=`
 
 function updateFullName() {
     connection.query(`UPDATE employees
-    SET full_name = CONCAT(first_name, " ", last_name);`, function (err, res) {
+    SET full_name = CONCAT(first_name, "-", last_name);`, function (err, res) {
         if (err) throw err;
     })
 };

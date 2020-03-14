@@ -51,7 +51,7 @@ VALUES (825469, "Mike", "Lewis", 4944, 284662);
 
 
 UPDATE employees
-SET full_name = CONCAT(first_name, "  ", last_name);
+SET full_name = CONCAT(first_name, " ", last_name);
 
 UPDATE managers
-SET mgr_full_name = CONCAT(mgr_first_name, "  ", mgr_last_name)
+SET mgr_full_name = CONCAT(mgr_first_name, " ", mgr_last_name)
