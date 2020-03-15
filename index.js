@@ -60,7 +60,7 @@ const questions = [
             return answers.action === "View Employees By Department";
         },
         filter: function (val) {
-            var splitList = val.split(" ").pop();
+            var splitList = val.split(" ").pop().slice(0, -1);
             return splitList;
         }
     },
@@ -73,7 +73,7 @@ const questions = [
             return answers.action === "View Employees By Manager";
         },
         filter: function (val) {
-            var splitList = val.split(" ").pop();
+            var splitList = val.split(" ").pop().slice(0, -1);
             return splitList;
         }
     },
@@ -102,7 +102,7 @@ const questions = [
             return answers.action === "Delete Department".red;
         },
         filter: function (val) {
-            var splitList = val.split(" ").pop();
+            var splitList = val.split(" ").pop().slice(0, -1);
             return splitList;
         }
     },
@@ -141,7 +141,7 @@ const questions = [
             return answers.action === "Add Role";
         },
         filter: function (val) {
-            var splitList = val.split(" ").pop();
+            var splitList = val.split(" ").pop().slice(0, -1);
             return splitList;
         }
     },
@@ -154,7 +154,7 @@ const questions = [
             return answers.action === "Update Role";
         },
         filter: function (val) {
-            var splitList = val.split(" ").pop();
+            var splitList = val.split(" ").pop().slice(0, -1);
             return splitList;
         }
     },
@@ -192,7 +192,7 @@ const questions = [
             return answers.roleUpdateChoice === "Update";
         },
         filter: function (val) {
-            var splitList = val.split(" ").pop();
+            var splitList = val.split(" ").pop().slice(0, -1);
             return splitList;
         }
     },
@@ -229,7 +229,7 @@ const questions = [
             return answers.action === "Add Employee";
         },
         filter: function (val) {
-            var splitList = val.split(" ").pop();
+            var splitList = val.split(" ").pop().slice(0, -1);
             return splitList;
         }
     },
@@ -242,7 +242,7 @@ const questions = [
             return answers.action === "Add Employee";
         },
         filter: function (val) {
-            var splitList = val.split(" ").pop();
+            var splitList = val.split(" ").pop().slice(0, -1);
             return splitList;
         }
     },
@@ -289,7 +289,7 @@ const questions = [
             return answers.employeeUpdateChoice === "Update";
         },
         filter: function (val) {
-            var splitList = val.split(" ").pop();
+            var splitList = val.split(" ").pop().slice(0, -1);
             return splitList;
         }
     },
@@ -302,7 +302,7 @@ const questions = [
             return answers.employeeUpdateChoice === "Update";
         },
         filter: function (val) {
-            var splitList = val.split(" ").pop();
+            var splitList = val.split(" ").pop().slice(0, -1);
             return splitList;
         }
     },
@@ -333,7 +333,7 @@ async function getDepartments() {
     connection.query(`SELECT id, dept_name FROM companydb.departments;`, function (err, res) {
         if (err) throw err;
         for (var i = 0; i < res.length; i++) {
-            departments.push(`${res[i].dept_name} - ${res[i].id}`);
+            departments.push(`${res[i].dept_name} (ID ${res[i].id})`);
         }
     })
 };
@@ -342,7 +342,7 @@ function getRoles() {
     connection.query(`SELECT title, id FROM companydb.roles;`, function (err, res) {
         if (err) throw err;
         for (var i = 0; i < res.length; i++) {
-            roles.push(`${res[i].title} - ${res[i].id}`);
+            roles.push(`${res[i].title} (ID ${res[i].id})`);
         }
     })
 };
@@ -351,7 +351,7 @@ function getManagers() {
     connection.query(`SELECT mgr_full_name, id FROM companydb.managers;`, function (err, res) {
         if (err) throw err;
         for (var i = 0; i < res.length; i++) {
-            managers.push(`${res[i].mgr_full_name} - ${res[i].id}`);
+            managers.push(`${res[i].mgr_full_name} (ID ${res[i].id})`);
         }
     })
 };
