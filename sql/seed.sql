@@ -21,6 +21,9 @@ INSERT INTO roles (id, title, salary, dept_id)
 VALUES (2946, "Customer Service Rep", 48000, 67);
 
 INSERT INTO roles (id, title, salary, dept_id)
+VALUES (3635, "Sr Engineer", 70000, 11);
+
+INSERT INTO roles (id, title, salary, dept_id)
 VALUES (6794, "Human Resources Manager", 65000, 37);
 
 INSERT INTO roles (id, title, salary, dept_id)
@@ -28,6 +31,9 @@ VALUES (7813, "Finance Manager", 65000, 93);
 
 INSERT INTO roles (id, title, salary, dept_id)
 VALUES (2701, "Customer Service Manager", 65000, 67);
+
+INSERT INTO roles (id, title, salary, dept_id)
+VALUES (1947, "R&D Manager", 71000, 11);
 
 
 INSERT INTO managers (id, mgr_first_name, mgr_last_name, role_id)
@@ -39,6 +45,9 @@ VALUES (329569, "Julia", "Fuego", 7813);
 INSERT INTO managers (id, mgr_first_name, mgr_last_name, role_id)
 VALUES (103645, "Sammy", "Lynn", 2701);
 
+INSERT INTO managers (id, mgr_first_name, mgr_last_name, role_id)
+VALUES (470465, "Richard", "Morris", 1947);
+
 
 INSERT INTO employees (id, first_name, last_name, role_id, manager_id)
 VALUES (265583, "Jessica", "Long", 2946, 103645);
@@ -48,6 +57,9 @@ VALUES (146395, "Mia", "Johnson", 3898, 329569);
 
 INSERT INTO employees (id, first_name, last_name, role_id, manager_id)
 VALUES (825469, "Mike", "Lewis", 4944, 284662);
+
+INSERT INTO employees (id, first_name, last_name, role_id, manager_id)
+VALUES (357829, "Carole", "Anderson", 3635, 103645);
 
 
 UPDATE employees

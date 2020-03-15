@@ -464,7 +464,6 @@ function askQuestions() {
 
 function viewEmployees() {
     connection.query(`SELECT managers.id AS ID, mgr_full_name AS NAME, roles.title AS ROLE, dept_name AS DEPARTMENT, CONCAT('$', FORMAT(salary, "C")) AS SALARY, "NA" AS MANAGER FROM managers
-    INNER JOIN employees ON employees.manager_id = managers.id
     INNER JOIN roles ON roles.id = managers.role_id
     INNER JOIN departments ON departments.id = roles.dept_id
     UNION
