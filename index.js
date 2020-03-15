@@ -479,12 +479,17 @@ function viewEmployees() {
 };
 
 function viewEmployeesByDepartment() {
-    connection.query(`SELECT employees.id AS ID, employees.full_name AS NAME, roles.title AS ROLE, departments.dept_name AS DEPARTMENT, CONCAT('$', FORMAT(salary, "C")) AS SALARY, managers.mgr_full_name AS MANAGER
+    connection.query(`SELECT managers.id AS ID, mgr_full_name AS NAME, roles.title AS ROLE, dept_name AS DEPARTMENT, CONCAT('$', FORMAT(salary, "C")) AS SALARY, "NA" AS MANAGER FROM managers
+    INNER JOIN roles ON roles.id = managers.role_id
+    INNER JOIN departments ON departments.id = roles.dept_id
+    WHERE departments.id = ${departmentChoice}
+    UNION
+    SELECT employees.id AS ID, employees.full_name AS NAME, roles.title AS ROLE, departments.dept_name AS DEPARTMENT, CONCAT('$', FORMAT(salary, "C")) AS SALARY, managers.mgr_full_name AS MANAGER
     FROM (((departments
     INNER JOIN roles ON roles.dept_id = departments.id)
     INNER JOIN employees ON employees.role_id = roles.id)
     INNER JOIN managers ON managers.id = employees.manager_id)
-    WHERE departments.id = "${departmentChoice}";`, function (err, res) {
+    WHERE departments.id = ${departmentChoice};`, function (err, res) {
         if (err) throw err;
         console.table(res);
         advancePrompts();
