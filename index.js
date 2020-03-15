@@ -3,6 +3,9 @@ var mysql = require("mysql");
 var inquirer = require("inquirer");
 var consoletable = require("console.table");
 var colors = require("colors");
+var title = require("./title");
+var fs = require("fs");
+// var functions= require("./js/functions");
 
 // SQL set up
 var connection = mysql.createConnection({
@@ -16,26 +19,28 @@ var connection = mysql.createConnection({
 connection.connect((err) => {
     if (err) throw err;
     console.log("connected as id " + connection.threadId + "\n");
-    console.log(appName.green);
+    console.log(title.appName.green);
     getDepartments();
     getRoles();
     getManagers();
     getEmployees();
     getInfo();
+
+    // code to use use imported functions
+
+    // functions.getDepartments;
+    // functions.getRoles;
+    // functions.getManagers;
+    // functions.getEmployees;
+    // functions.getInfo;
 })
 
 // Global variables
 const departments = [];
 
-const departmentIDs = [];
-
 const roles = [];
 
-const roleIDs = [];
-
 const managers = [];
-
-const managerIDs = [];
 
 const employees = [];
 
@@ -53,6 +58,10 @@ const questions = [
         choices: departments,
         when: function (answers) {
             return answers.action === "View Employees By Department";
+        },
+        filter: function (val) {
+            var splitList = val.split(" ").pop();
+            return splitList;
         }
     },
     {
@@ -62,6 +71,10 @@ const questions = [
         choices: managers,
         when: function (answers) {
             return answers.action === "View Employees By Manager";
+        },
+        filter: function (val) {
+            var splitList = val.split(" ").pop();
+            return splitList;
         }
     },
     {
@@ -86,7 +99,11 @@ const questions = [
         message: "Select department to delete:",
         choices: departments,
         when: function (answers) {
-            return answers.action === "Delete Department";
+            return answers.action === "Delete Department".red;
+        },
+        filter: function (val) {
+            var splitList = val.split(" ").pop();
+            return splitList;
         }
     },
     {
@@ -119,9 +136,13 @@ const questions = [
         type: "list",
         name: "roleDeptID",
         message: "Select a department ID for the new role:",
-        choices: departmentIDs,
+        choices: departments,
         when: function (answers) {
             return answers.action === "Add Role";
+        },
+        filter: function (val) {
+            var splitList = val.split(" ").pop();
+            return splitList;
         }
     },
     {
@@ -131,6 +152,10 @@ const questions = [
         choices: roles,
         when: function (answers) {
             return answers.action === "Update Role";
+        },
+        filter: function (val) {
+            var splitList = val.split(" ").pop();
+            return splitList;
         }
     },
     {
@@ -162,9 +187,13 @@ const questions = [
         type: "list",
         name: "updateRoleDeptID",
         message: "Enter new department ID:",
-        choices: roleIDs,
+        choices: departments,
         when: function (answers) {
             return answers.roleUpdateChoice === "Update";
+        },
+        filter: function (val) {
+            var splitList = val.split(" ").pop();
+            return splitList;
         }
     },
     {
@@ -195,18 +224,26 @@ const questions = [
         type: "list",
         name: "employeeRoleID",
         message: "Select a role:",
-        choices: roleIDs,
+        choices: roles,
         when: function (answers) {
             return answers.action === "Add Employee";
+        },
+        filter: function (val) {
+            var splitList = val.split(" ").pop();
+            return splitList;
         }
     },
     {
         type: "list",
         name: "employeeManagerID",
         message: "Select a manager ID:",
-        choices: managerIDs,
+        choices: managers,
         when: function (answers) {
             return answers.action === "Add Employee";
+        },
+        filter: function (val) {
+            var splitList = val.split(" ").pop();
+            return splitList;
         }
     },
     {
@@ -247,18 +284,26 @@ const questions = [
         type: "list",
         name: "updatedEmployeeRoleID",
         message: "Update employee's role ID:",
-        choices: roleIDs,
+        choices: roles,
         when: function (answers) {
             return answers.employeeUpdateChoice === "Update";
+        },
+        filter: function (val) {
+            var splitList = val.split(" ").pop();
+            return splitList;
         }
     },
     {
         type: "list",
         name: "updatedEmployeeManagerID",
         message: "Update employee's manager ID:",
-        choices: managerIDs,
+        choices: managers,
         when: function (answers) {
             return answers.employeeUpdateChoice === "Update";
+        },
+        filter: function (val) {
+            var splitList = val.split(" ").pop();
+            return splitList;
         }
     },
 ];
@@ -288,8 +333,7 @@ async function getDepartments() {
     connection.query(`SELECT id, dept_name FROM companydb.departments;`, function (err, res) {
         if (err) throw err;
         for (var i = 0; i < res.length; i++) {
-            departments.push(res[i].dept_name);
-            departmentIDs.push(res[i].id);
+            departments.push(`${res[i].dept_name} - ${res[i].id}`);
         }
     })
 };
@@ -298,18 +342,16 @@ function getRoles() {
     connection.query(`SELECT title, id FROM companydb.roles;`, function (err, res) {
         if (err) throw err;
         for (var i = 0; i < res.length; i++) {
-            roles.push(res[i].title);
-            roleIDs.push(res[i].id);
+            roles.push(`${res[i].title} - ${res[i].id}`);
         }
     })
 };
 
 function getManagers() {
-    connection.query(`SELECT mgr_last_name, id FROM companydb.managers;`, function (err, res) {
+    connection.query(`SELECT mgr_full_name, id FROM companydb.managers;`, function (err, res) {
         if (err) throw err;
         for (var i = 0; i < res.length; i++) {
-            managers.push(res[i].mgr_last_name);
-            managerIDs.push(res[i].id);
+            managers.push(`${res[i].mgr_full_name} - ${res[i].id}`);
         }
     })
 };
@@ -360,6 +402,7 @@ function askQuestions() {
         };
 
         if (answers.action === "View Employees By Manager") {
+            console.log(managerChoice);
             viewEmployeesByManager();
         };
 
@@ -376,11 +419,11 @@ function askQuestions() {
         };
 
         if (answers.action === "Add Department") {
-            departments.push(answers.deptName);
+            departments.push(`${answers.deptName} - ${answers.deptID}`);
             addDepartment();
         };
 
-        if (answers.action === "Delete Department") {
+        if (answers.action === "Delete Department".red) {
             deleteDepartment();
         };
 
@@ -391,7 +434,7 @@ function askQuestions() {
         if (answers.action === "Update Role") {
             if (answers.roleUpdateChoice === "Update") {
                 updateRole();
-            } else if (answers.roleUpdateChoice === "Delete") {
+            } else {
                 deleteRole();
             }
         };
@@ -412,7 +455,7 @@ function askQuestions() {
             viewBudgets();
         };
 
-        if (answers.action === "EXIT") {
+        if (answers.action === "EXIT".red) {
             console.log("GOODBYE...");
             connection.end();
         };
@@ -442,7 +485,7 @@ function viewEmployeesByDepartment() {
     INNER JOIN roles ON roles.dept_id = departments.id)
     INNER JOIN employees ON employees.role_id = roles.id)
     INNER JOIN managers ON managers.id = employees.manager_id)
-    WHERE departments.dept_name = "${departmentChoice}";`, function (err, res) {
+    WHERE departments.id = "${departmentChoice}";`, function (err, res) {
         if (err) throw err;
         console.table(res);
         advancePrompts();
@@ -455,7 +498,7 @@ function viewEmployeesByManager() {
     INNER JOIN roles ON roles.dept_id = departments.id
     INNER JOIN employees ON employees.role_id = roles.id
     INNER JOIN managers ON managers.id = employees.manager_id
-    WHERE managers.mgr_last_name = "${managerChoice}";`, function (err, res) {
+    WHERE managers.id = "${managerChoice}";`, function (err, res) {
         if (err) throw err;
         console.table(res);
         advancePrompts();
@@ -498,9 +541,9 @@ function addDepartment() {
     });
 }
 
-function deleteDepartment() {
+function deleteDepartment() { console.log(deletedDepartmentName);
     connection.query(`DELETE FROM departments
-    WHERE dept_name = "${deletedDepartmentName}";`, function (err, res) {
+    WHERE id = "${deletedDepartmentName}";`, function (err, res) {
         if (err) throw err;
         advancePrompts();
     });
@@ -516,16 +559,19 @@ function addRole() {
 
 function updateRole() {
     connection.query(`UPDATE roles
-    SET title = "${updatedTitle}", salary = ${updatedSalary}
-    WHERE title = "${updatedRole}";`, function (err, res) {
+    SET title = "${updatedTitle}", salary = ${updatedSalary} 
+    WHERE id = "${updatedRole}";`, function (err, res) {
         if (err) throw err;
+        console.log(updatedTitle);
+        console.log(updatedSalary);
+        console.log(updatedRole);
         advancePrompts();
     });
 }
 
 function deleteRole() {
     connection.query(`DELETE FROM roles
-    WHERE title = "${updatedRole}";`, function (err, res) {
+    WHERE id = "${updatedRole}";`, function (err, res) {
         if (err) throw err;
         advancePrompts();
     });
@@ -585,42 +631,6 @@ async function getInfo() {
     askQuestions();
 };
 
-const appName =`
-TTTTTTTTTTTTTTTTTTTTTTT                                                                                                                             
-T:::::::::::::::::::::T                                                                              ,@&@&@@* 
-T:::::::::::::::::::::T                                                                             &........@ 
-T:::::TT:::::::TT:::::T                                                                             @........& 
-TTTTTT  T:::::T  TTTTTTeeeeeeeeeeee    aaaaaaaaaaaaa      mmmmmmm    mmmmmmm                        ,........,
-        T:::::T      ee::::::::::::ee  a::::::::::::a   mm:::::::m  m:::::::mm                       .......                           
-        T:::::T     e::::::eeeee:::::eeaaaaaaaaa:::::a m::::::::::mm::::::::::m                      % .,.. %                             
-        T:::::T    e::::::e     e:::::e         a::::a m::::::::::::::::::::::m                   &&&%,./* (@&&&                               
-        T:::::T    e:::::::eeeee::::::e  aaaaaaa:::::a m:::::mmm::::::mmm:::::m                  &&&&%  /  (%&&&&                               
-        T:::::T    e:::::::::::::::::e aa::::::::::::a m::::m   m::::m   m::::m                 &&&&&%  // (&&&&&                                
-        T:::::T    e::::::eeeeeeeeeee a::::aaaa::::::a m::::m   m::::m   m::::m                 &&&&&&  // #&&&&&                                
-        T:::::T    e:::::::e         a::::a    a:::::a m::::m   m::::m   m::::m                 &&&@&&, (. #&&@&&,                                
-      TT:::::::TT  e::::::::e        a::::a    a:::::a m::::m   m::::m   m::::m                  ,&@&&@&&&&@&&@&(/                                 
-      T:::::::::T   e::::::::eeeeeeeea:::::aaaa::::::a m::::m   m::::m   m::::m                 , . &&&&%&&&&& ./.                                 
-      T:::::::::T    ee:::::::::::::e a::::::::::aa:::am::::m   m::::m   m::::m                     &&&&(&&&&&%&&%%                             
-      TTTTTTTTTTT      eeeeeeeeeeeeee  aaaaaaaaaa  aaaammmmmm   mmmmmm   mmmmmm                     &&&&*&&&&&%#&%%
-                                                                                                    &&&&.&&&&&%#%%%
-TTTTTTTTTTTTTTTTTTTTTTT                                                       kkkkkkkk              &&&&.&&&&&                             
-T:::::::::::::::::::::T                                                       k::::::k              %%#& &&&&&                             
-T:::::::::::::::::::::T                                                       k::::::k           &&&&&&& &&&&&&&                                 
-T:::::TT:::::::TT:::::T                                                       k::::::k                                                
-TTTTTT  T:::::T  TTTTTTrrrrr   rrrrrrrrr   aaaaaaaaaaaaa      cccccccccccccccc k:::::k    kkkkkkk eeeeeeeeeeee    rrrrr   rrrrrrrrr   
-        T:::::T        r::::rrr:::::::::r  a::::::::::::a   cc:::::::::::::::c k:::::k   k:::::kee::::::::::::ee  r::::rrr:::::::::r  
-        T:::::T        r:::::::::::::::::r aaaaaaaaa:::::a c:::::::::::::::::c k:::::k  k:::::ke::::::eeeee:::::eer:::::::::::::::::r 
-        T:::::T        rr::::::rrrrr::::::r         a::::ac:::::::cccccc:::::c k:::::k k:::::ke::::::e     e:::::err::::::rrrrr::::::r
-        T:::::T         r:::::r     r:::::r  aaaaaaa:::::ac::::::c     ccccccc k::::::k:::::k e:::::::eeeee::::::e r:::::r     r:::::r
-        T:::::T         r:::::r     rrrrrrraa::::::::::::ac:::::c              k:::::::::::k  e:::::::::::::::::e  r:::::r     rrrrrrr
-        T:::::T         r:::::r           a::::aaaa::::::ac:::::c              k:::::::::::k  e::::::eeeeeeeeeee   r:::::r            
-        T:::::T         r:::::r          a::::a    a:::::ac::::::c     ccccccc k::::::k:::::k e:::::::e            r:::::r            
-      TT:::::::TT       r:::::r          a::::a    a:::::ac:::::::cccccc:::::ck::::::k k:::::ke::::::::e           r:::::r            
-      T:::::::::T       r:::::r          a:::::aaaa::::::a c:::::::::::::::::ck::::::k  k:::::ke::::::::eeeeeeee   r:::::r            
-      T:::::::::T       r:::::r           a::::::::::aa:::a cc:::::::::::::::ck::::::k   k:::::kee:::::::::::::e   r:::::r            
-      TTTTTTTTTTT       rrrrrrr            aaaaaaaaaa  aaaa   cccccccccccccccckkkkkkkk    kkkkkkk eeeeeeeeeeeeee   rrrrrrr
-`
-
 function updateFullName() {
     connection.query(`UPDATE employees
     SET full_name = CONCAT(first_name, " ", last_name);`, function (err, res) {
@@ -628,3 +638,5 @@ function updateFullName() {
     })
 };
 
+// make connection variable available to functions in external file
+    //exports.connection = connection;

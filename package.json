@@ -12,6 +12,7 @@
   "dependencies": {
     "colors": "^1.4.0",
     "console.table": "^0.10.0",
+    "fs": "0.0.1-security",
     "inquirer": "^7.1.0",
     "mysql": "^2.18.1"
   }
