@@ -708,7 +708,17 @@ function askQuestions() {
         };
 
         if (answers.action === "EXIT".red) {
-            console.log("GOODBYE...");
+            var disconnectMessages = [
+                "Productivity tip #1: Turn off Distractions...",
+                "Productivity tip #2: Take Breaks...",
+                "Productivity tip #3: Eat a Healthy Breakfast..." ,
+                "Productivity tip #4: Get Some Exercise...",
+                "Productivity tip #5: Record All Your Thoughts And Ideas...",
+                "Productivity tip #6: Laugh More...",
+                "Productivity tip #7: Have a Plan..."
+            ];
+            var disconnectMessage = disconnectMessages[Math.floor(Math.random()*disconnectMessages.length)];
+            console.log(`HAVE A GREAT DAY!\n\n${disconnectMessage.green.bold}`);
             connection.end();
         };
     });
