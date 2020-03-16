@@ -21,6 +21,16 @@ CREATE TABLE roles
     FOREIGN KEY (dept_id) REFERENCES departments (id)
 );
 
+CREATE TABLE mgr_roles
+(
+    id INT,
+    title VARCHAR(30),
+    salary DECIMAL NOT NULL,
+    dept_id INT NOT NULL,
+    PRIMARY KEY(id),
+    FOREIGN KEY (dept_id) REFERENCES departments (id)
+);
+
 CREATE TABLE managers
 (
     id INT,

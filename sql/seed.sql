@@ -23,16 +23,17 @@ VALUES (2946, "Customer Service Rep", 48000, 67);
 INSERT INTO roles (id, title, salary, dept_id)
 VALUES (3635, "Sr Engineer", 70000, 11);
 
-INSERT INTO roles (id, title, salary, dept_id)
+
+INSERT INTO mgr_roles (id, title, salary, dept_id)
 VALUES (6794, "Human Resources Manager", 65000, 37);
 
-INSERT INTO roles (id, title, salary, dept_id)
+INSERT INTO mgr_roles (id, title, salary, dept_id)
 VALUES (7813, "Finance Manager", 65000, 93);
 
-INSERT INTO roles (id, title, salary, dept_id)
+INSERT INTO mgr_roles (id, title, salary, dept_id)
 VALUES (2701, "Customer Service Manager", 65000, 67);
 
-INSERT INTO roles (id, title, salary, dept_id)
+INSERT INTO mgr_roles (id, title, salary, dept_id)
 VALUES (1947, "R&D Manager", 71000, 11);
 
 

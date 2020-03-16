@@ -22,6 +22,7 @@ connection.connect((err) => {
     console.log(title.appName.green);
     getDepartments();
     getRoles();
+    getManagerRoles();
     getManagers();
     getEmployees();
     getInfo();
@@ -40,6 +41,8 @@ const departments = [];
 
 const roles = [];
 
+const managerRoles = [];
+
 const managers = [];
 
 const employees = [];
@@ -49,7 +52,7 @@ const questions = [
         type: "list",
         name: "action",
         message: "What would you like to do?",
-        choices: ["View Employees", "View Employees By Department", "View Employees By Manager", "View Managers", "View Departments", "Add Department", "Delete Department".red, "View Roles", "Add Role", "Update/Delete Role", "Add Employee", "Update/Delete Employee", "View Budgets", "EXIT".red]
+        choices: ["View All Employees", "View Employees By Department", "View Employees By Manager", "View Managers", "Add Managers","Update/Delete Managers", "View Departments", "Add Departments", "Delete Departments".red, "View Roles", "Add Roles", "Update/Delete Roles", "View Manager Roles", "Add Manager Roles", "Update/Delete Manager Roles","Add Employees", "Update/Delete Employees", "View Budgets", "EXIT".red]
     },
     {
         type: "list",
@@ -77,12 +80,102 @@ const questions = [
             return splitList;
         }
     },
+
+    // Add a manager
+    {
+        type: "input",
+        name: "managerID",
+        message: "Enter new manager ID:",
+        when: function (answers) {
+            return answers.action === "Add Managers";
+        }
+    },
+    {
+        type: "input",
+        name: "managerFname",
+        message: "Enter the manager's first name:",
+        when: function (answers) {
+            return answers.action === "Add Managers";
+        }
+    },
+    {
+        type: "input",
+        name: "managerLname",
+        message: "Enter the manager's last name:",
+        when: function (answers) {
+            return answers.action === "Add Managers";
+        }
+    },
+    {
+        type: "list",
+        name: "managerRoleID",
+        message: "Select a role:",
+        choices: managerRoles,
+        when: function (answers) {
+            return answers.action === "Add Managers";
+        },
+        filter: function (val) {
+            var splitList = val.split(" ").pop().slice(0, -1);
+            return splitList;
+        }
+    },
+
+    // Update/delete a manager
+    {
+        type: "list",
+        name: "updatedManager",
+        message: "Select an manager:",
+        choices: managers,
+        when: function (answers) {
+            return answers.action === "Update/Delete Managers";
+        }
+    },
+    {
+        type: "list",
+        name: "managerUpdateChoice",
+        message: "Select an action:",
+        choices: ["Update", "Delete".red],
+        when: function (answers) {
+            return answers.action === "Update/Delete Managers";
+        }
+    },
+    {
+        type: "input",
+        name: "updatedManagerFirstName",
+        message: "Update manager's first name:",
+        when: function (answers) {
+            return answers.managerUpdateChoice === "Update";
+        }
+    },
+    {
+        type: "input",
+        name: "updatedManagerLastName",
+        message: "Update manager's last name:",
+        when: function (answers) {
+            return answers.managerUpdateChoice === "Update";
+        }
+    },
+    {
+        type: "list",
+        name: "updatedManagerRoleID",
+        message: "Update manager's role ID:",
+        choices: managerRoles,
+        when: function (answers) {
+            return answers.managerUpdateChoice === "Update";
+        },
+        filter: function (val) {
+            var splitList = val.split(" ").pop().slice(0, -1);
+            return splitList;
+        }
+    },
+
+    // Add a department
     {
         type: "input",
         name: "deptID",
         message: "Enter a department ID:",
         when: function (answers) {
-            return answers.action === "Add Department";
+            return answers.action === "Add Departments";
         }
     },
     {
@@ -90,29 +183,33 @@ const questions = [
         name: "deptName",
         message: "Enter the department name:",
         when: function (answers) {
-            return answers.action === "Add Department";
+            return answers.action === "Add Departments";
         }
     },
+
+    // Delete a department
     {
         type: "list",
         name: "deptDeleteName",
         message: "Select department to delete:",
         choices: departments,
         when: function (answers) {
-            return answers.action === "Delete Department".red;
+            return answers.action === "Delete Departments".red;
         },
         filter: function (val) {
             var splitList = val.split(" ").pop().slice(0, -1);
             return splitList;
         }
     },
+
+    // Add a role
     {
         type: "input",
         name: "roleID",
         message: "Enter a new role ID:",
 
         when: function (answers) {
-            return answers.action === "Add Role";
+            return answers.action === "Add Roles";
         }
     },
     {
@@ -121,7 +218,7 @@ const questions = [
         message: "Enter a title for the new role:",
 
         when: function (answers) {
-            return answers.action === "Add Role";
+            return answers.action === "Add Roles";
         }
     },
     {
@@ -129,7 +226,7 @@ const questions = [
         name: "roleSalary",
         message: "Enter a salary for the new role:",
         when: function (answers) {
-            return answers.action === "Add Role";
+            return answers.action === "Add Roles";
         }
     },
     {
@@ -138,20 +235,22 @@ const questions = [
         message: "Select a department ID for the new role:",
         choices: departments,
         when: function (answers) {
-            return answers.action === "Add Role";
+            return answers.action === "Add Roles";
         },
         filter: function (val) {
             var splitList = val.split(" ").pop().slice(0, -1);
             return splitList;
         }
     },
+
+    // Update/delete a role
     {
         type: "list",
         name: "roleUpdate",
         message: "Select a role:",
         choices: roles,
         when: function (answers) {
-            return answers.action === "Update/Delete Role";
+            return answers.action === "Update/Delete Roles";
         },
         filter: function (val) {
             var splitList = val.split(" ").pop().slice(0, -1);
@@ -164,7 +263,7 @@ const questions = [
         message: "Select an action:",
         choices: ["Update", "Delete".red],
         when: function (answers) {
-            return answers.action === "Update/Delete Role";
+            return answers.action === "Update/Delete Roles";
         }
     },
     {
@@ -196,12 +295,108 @@ const questions = [
             return splitList;
         }
     },
+
+    // Add a manager role
+    {
+        type: "input",
+        name: "managerRoleID",
+        message: "Enter a new manager role ID:",
+
+        when: function (answers) {
+            return answers.action === "Add Manager Roles";
+        }
+    },
+    {
+        type: "input",
+        name: "managerRoleTitle",
+        message: "Enter a title for the new manager role:",
+
+        when: function (answers) {
+            return answers.action === "Add Manager Roles";
+        }
+    },
+    {
+        type: "input",
+        name: "managerRoleSalary",
+        message: "Enter a salary for the new manager role:",
+        when: function (answers) {
+            return answers.action === "Add Manager Roles";
+        }
+    },
+    {
+        type: "list",
+        name: "managerRoleDeptID",
+        message: "Select a department ID for the new manager role:",
+        choices: departments,
+        when: function (answers) {
+            return answers.action === "Add Manager Roles";
+        },
+        filter: function (val) {
+            var splitList = val.split(" ").pop().slice(0, -1);
+            return splitList;
+        }
+    },
+
+    // Update/delete a manager role
+    {
+        type: "list",
+        name: "managerRoleUpdate",
+        message: "Select a role:",
+        choices: managerRoles,
+        when: function (answers) {
+            return answers.action === "Update/Delete Manager Roles";
+        },
+        filter: function (val) {
+            var splitList = val.split(" ").pop().slice(0, -1);
+            return splitList;
+        }
+    },
+    {
+        type: "list",
+        name: "managerRoleUpdateChoice",
+        message: "Select an action:",
+        choices: ["Update", "Delete".red],
+        when: function (answers) {
+            return answers.action === "Update/Delete Manager Roles";
+        }
+    },
+    {
+        type: "input",
+        name: "updateManagerTitle",
+        message: "Enter new title:",
+        when: function (answers) {
+            return answers.managerRoleUpdateChoice === "Update";
+        }
+    },
+    {
+        type: "input",
+        name: "updateManagerSalary",
+        message: "Enter new salary:",
+        when: function (answers) {
+            return answers.managerRoleUpdateChoice === "Update";
+        }
+    },
+    {
+        type: "list",
+        name: "updateManagerRoleDeptID",
+        message: "Enter new department ID:",
+        choices: departments,
+        when: function (answers) {
+            return answers.managerRoleUpdateChoice === "Update";
+        },
+        filter: function (val) {
+            var splitList = val.split(" ").pop().slice(0, -1);
+            return splitList;
+        }
+    },
+
+    // Add an employee
     {
         type: "input",
         name: "employeeID",
         message: "Enter new employee ID:",
         when: function (answers) {
-            return answers.action === "Add Employee";
+            return answers.action === "Add Employees";
         }
     },
     {
@@ -209,7 +404,7 @@ const questions = [
         name: "fname",
         message: "Enter the employee's first name:",
         when: function (answers) {
-            return answers.action === "Add Employee";
+            return answers.action === "Add Employees";
         }
     },
     {
@@ -217,7 +412,7 @@ const questions = [
         name: "lname",
         message: "Enter the employee's last name:",
         when: function (answers) {
-            return answers.action === "Add Employee";
+            return answers.action === "Add Employees";
         }
     },
     {
@@ -226,7 +421,7 @@ const questions = [
         message: "Select a role:",
         choices: roles,
         when: function (answers) {
-            return answers.action === "Add Employee";
+            return answers.action === "Add Employees";
         },
         filter: function (val) {
             var splitList = val.split(" ").pop().slice(0, -1);
@@ -239,20 +434,22 @@ const questions = [
         message: "Select a manager ID:",
         choices: managers,
         when: function (answers) {
-            return answers.action === "Add Employee";
+            return answers.action === "Add Employees";
         },
         filter: function (val) {
             var splitList = val.split(" ").pop().slice(0, -1);
             return splitList;
         }
     },
+
+    // Update/delete an employee
     {
         type: "list",
         name: "updatedEmployee",
         message: "Select an employee:",
         choices: employees,
         when: function (answers) {
-            return answers.action === "Update/Delete Employee";
+            return answers.action === "Update/Delete Employees";
         }
     },
     {
@@ -261,7 +458,7 @@ const questions = [
         message: "Select an action:",
         choices: ["Update", "Delete".red],
         when: function (answers) {
-            return answers.action === "Update/Delete Employee";
+            return answers.action === "Update/Delete Employees";
         }
     },
     {
@@ -347,6 +544,15 @@ function getRoles() {
     })
 };
 
+function getManagerRoles() {
+    connection.query(`SELECT title, id FROM companydb.mgr_roles;`, function (err, res) {
+        if (err) throw err;
+        for (var i = 0; i < res.length; i++) {
+            managerRoles.push(`${res[i].title} (ID ${res[i].id})`);
+        }
+    })
+};
+
 function getManagers() {
     connection.query(`SELECT mgr_full_name, id FROM companydb.managers;`, function (err, res) {
         if (err) throw err;
@@ -371,30 +577,46 @@ function askQuestions() {
         deletedDepartmentName = answers.deptDeleteName;
         managerChoice = answers.managerChoice;
         title = answers.roleTitle;
+        managerTitle = answers.managerRoleTitle;
         roleID = answers.roleID;
+        managerRoleID = answers.managerRoleID;
         salary = answers.roleSalary;
+        managerSalary = answers.managerRoleSalary;
         roleDept = answers.roleDept;
         roleDeptID = answers.roleDeptID;
+        managerRoleDeptID = answers.managerRoleDeptID;
         updatedRole = answers.roleUpdate;
+        updatedManagerRole = answers.managerRoleUpdate;
         updatedTitle = answers.updateTitle;
+        updatedManagerTitle = answers.updateManagerTitle;
         updatedSalary = answers.updateSalary;
+        updatedManagerSalary = answers.updateManagerSalary;
         updatedRoleDeptID = answers.updateRoleDeptID;
         departmentID = answers.deptID;
         departmentChoice = answers.deptChoice;
         employeeID = answers.employeeID;
+        managerID = answers.managerID;
         employeeRole = answers.employeeRole;
+        managerRole = answers.managerRole;
         employeeRoleID = answers.employeeRoleID;
+        managerRoleID = answers.managerRoleID;
         employeeManagerID = answers.employeeManagerID;
         fname = answers.fname;
         lname = answers.lname;
+        managerFname = answers.managerFname;
+        managerLname = answers.managerLname;
         updatedEmployee = answers.updatedEmployee;
+        updatedManager = answers.updatedManager;
         updatedFirstName = answers.updatedFirstName;
         updatedLastName = answers.updatedLastName;
+        updatedManagerFirstName = answers.updatedManagerFirstName;
+        updatedManagerLastName = answers.updatedManagerLastName;
         updatedEmployeeRoleID = answers.updatedEmployeeRoleID;
+        updatedManagerRoleID = answers.updatedManagerRoleID;
         updatedEmployeeManagerID = answers.updatedEmployeeManagerID;
 
-        if (answers.action === "View Employees") {
-            viewEmployees();
+        if (answers.action === "View All Employees") {
+            viewAllEmployees();
         };
 
         if (answers.action === "View Employees By Department") {
@@ -410,28 +632,40 @@ function askQuestions() {
             viewManagers();
         };
 
+        if (answers.action === "Add Managers") {
+            addManager();
+        };
+
+        if (answers.action === "Update/Delete Managers") {
+            if (answers.managerUpdateChoice === "Update") {
+                updateManager();
+            } else {
+                deleteManager();
+            };
+        };
+
         if (answers.action === "View Departments") {
             viewDepartments();
+        };
+
+        if (answers.action === "Add Departments") {
+            departments.push(`${answers.deptName} - ${answers.deptID}`);
+            addDepartment();
+        };
+
+        if (answers.action === "Delete Departments".red) {
+            deleteDepartment();
         };
 
         if (answers.action === "View Roles") {
             viewRoles();
         };
 
-        if (answers.action === "Add Department") {
-            departments.push(`${answers.deptName} - ${answers.deptID}`);
-            addDepartment();
-        };
-
-        if (answers.action === "Delete Department".red) {
-            deleteDepartment();
-        };
-
-        if (answers.action === "Add Role") {
+        if (answers.action === "Add Roles") {
             addRole();
         };
 
-        if (answers.action === "Update/Delete Role") {
+        if (answers.action === "Update/Delete Roles") {
             if (answers.roleUpdateChoice === "Update") {
                 updateRole();
             } else {
@@ -439,11 +673,29 @@ function askQuestions() {
             }
         };
 
-        if (answers.action === "Add Employee") {
+        if (answers.action === "View Manager Roles") {
+            viewManagerRoles();
+        };
+        
+        if (answers.action === "Add Manager Roles") {
+            managerRoles.push(`${answers.deptName} - ${answers.deptID}`);
+            addManagerRole();
+        };
+
+        if (answers.action === "Update/Delete Manager Roles") {
+            if (answers.roleUpdateChoice === "Update") {
+                updateManagerRole();
+            } else {
+                deleteManagerRole();
+            }
+        };
+
+        if (answers.action === "Add Employees") {
+            employees.push(`${answers.fname} ${answers.lname}`);
             addEmployee();
         };
 
-        if (answers.action === "Update/Delete Employee") {
+        if (answers.action === "Update/Delete Employees") {
             if (answers.employeeUpdateChoice === "Update") {
                 updateEmployee();
             } else {
@@ -462,12 +714,12 @@ function askQuestions() {
     });
 };
 
-function viewEmployees() {
-    connection.query(`SELECT managers.id AS ID, mgr_full_name AS NAME, roles.title AS ROLE, dept_name AS DEPARTMENT, CONCAT('$', FORMAT(salary, "C")) AS SALARY, "NA" AS MANAGER FROM managers
-    INNER JOIN roles ON roles.id = managers.role_id
-    INNER JOIN departments ON departments.id = roles.dept_id
+function viewAllEmployees() {
+    connection.query(`SELECT managers.id AS ID, mgr_full_name AS NAME, mgr_roles.title AS ROLE, departments.dept_name AS DEPARTMENT, CONCAT('$', FORMAT(mgr_roles.salary, "C")) AS SALARY, "NA" AS MANAGER FROM managers
+    INNER JOIN mgr_roles ON mgr_roles.id = managers.role_id
+    INNER JOIN departments ON departments.id = mgr_roles.dept_id
     UNION
-    SELECT employees.id AS ID, full_name AS NAME, roles.title AS ROLE, dept_name AS DEPARTMENT, CONCAT('$', FORMAT(salary, "C")) AS SALARY, mgr_full_name AS MANAGER FROM employees
+    SELECT employees.id AS ID, full_name AS NAME, roles.title AS ROLE, dept_name AS DEPARTMENT, CONCAT('$', FORMAT(roles.salary, "C")) AS SALARY, mgr_full_name AS MANAGER FROM employees
     INNER JOIN roles ON roles.id = employees.role_id
     INNER JOIN managers ON managers.id = employees.manager_id
     INNER JOIN departments ON departments.id = roles.dept_id
@@ -479,9 +731,9 @@ function viewEmployees() {
 };
 
 function viewEmployeesByDepartment() {
-    connection.query(`SELECT managers.id AS ID, mgr_full_name AS NAME, roles.title AS ROLE, dept_name AS DEPARTMENT, CONCAT('$', FORMAT(salary, "C")) AS SALARY, "NA" AS MANAGER FROM managers
-    INNER JOIN roles ON roles.id = managers.role_id
-    INNER JOIN departments ON departments.id = roles.dept_id
+    connection.query(`SELECT managers.id AS ID, mgr_full_name AS NAME, mgr_roles.title AS ROLE, dept_name AS DEPARTMENT, CONCAT('$', FORMAT(salary, "C")) AS SALARY, "NA" AS MANAGER FROM managers
+    INNER JOIN mgr_roles ON mgr_roles.id = managers.role_id
+    INNER JOIN departments ON departments.id = mgr_roles.dept_id
     WHERE departments.id = ${departmentChoice}
     UNION
     SELECT employees.id AS ID, employees.full_name AS NAME, roles.title AS ROLE, departments.dept_name AS DEPARTMENT, CONCAT('$', FORMAT(salary, "C")) AS SALARY, managers.mgr_full_name AS MANAGER
@@ -512,8 +764,8 @@ function viewEmployeesByManager() {
 function viewManagers() {
     connection.query(`SELECT managers.id AS ID, managers.mgr_full_name AS NAME, departments.dept_name AS DEPARTMENT
     FROM managers
-    INNER JOIN roles ON roles.id = managers.role_id
-    INNER JOIN departments ON departments.id = roles.dept_id`, function (err, res) {
+    INNER JOIN mgr_roles ON mgr_roles.id = managers.role_id
+    INNER JOIN departments ON departments.id = mgr_roles.dept_id`, function (err, res) {
         if (err) throw err;
         console.table(res);
         advancePrompts();
@@ -531,6 +783,15 @@ function viewDepartments() {
 function viewRoles() {
     connection.query(`SELECT roles.id AS ID, roles.title AS ROLE, CONCAT('$', FORMAT(salary, "C")) AS SALARY, departments.dept_name AS DEPARTMENT FROM companydb.departments
 	INNER JOIN roles ON roles.dept_id = departments.id`, function (err, res) {
+        if (err) throw err;
+        console.table(res);
+        advancePrompts();
+    });
+};
+
+function viewManagerRoles() {
+    connection.query(`SELECT mgr_roles.id AS ID, mgr_roles.title AS ROLE, CONCAT('$', FORMAT(salary, "C")) AS SALARY, departments.dept_name AS DEPARTMENT FROM companydb.departments
+	INNER JOIN mgr_roles ON mgr_roles.dept_id = departments.id`, function (err, res) {
         if (err) throw err;
         console.table(res);
         advancePrompts();
@@ -559,6 +820,14 @@ function addRole() {
         if (err) throw err;
         advancePrompts();
     });
+};
+
+function addManagerRole() {
+    connection.query(`INSERT INTO mgr_roles (id, title, salary, dept_id)
+    VALUES (${managerRoleID}, "${managerTitle}", "${managerSalary}", "${managerRoleDeptID}");`, function (err, res) {
+        if (err) throw err;
+        advancePrompts();
+    });
 }
 
 function updateRole() {
@@ -573,9 +842,26 @@ function updateRole() {
     });
 }
 
+function updateManagerRole() {
+    connection.query(`UPDATE mgr_roles
+    SET title = "${updatedManagerTitle}", salary = ${updatedManagerSalary} 
+    WHERE id = "${updatedManagerRole}";`, function (err, res) {
+        if (err) throw err;
+        advancePrompts();
+    });
+};
+
 function deleteRole() {
     connection.query(`DELETE FROM roles
     WHERE id = "${updatedRole}";`, function (err, res) {
+        if (err) throw err;
+        advancePrompts();
+    });
+}
+
+function deleteManagerRole() {
+    connection.query(`DELETE FROM mgr_roles
+    WHERE id = "${updatedManagerRole}";`, function (err, res) {
         if (err) throw err;
         advancePrompts();
     });
@@ -590,6 +876,16 @@ function addEmployee() {
     });
 };
 
+function addManager() {
+    connection.query(`INSERT INTO managers (id, mgr_first_name, mgr_last_name, role_id)
+    VALUES (${managerID}, "${managerFname}", "${managerLname}", ${managerRoleID});`, function (err, res) {
+        if (err) throw err;
+        updateFullName();
+        advancePrompts();
+    });
+};
+
+
 function updateEmployee() {
     connection.query(`UPDATE employees
     SET first_name = "${updatedFirstName}", last_name = "${updatedLastName}", role_id = ${updatedEmployeeRoleID}, manager_id = ${updatedEmployeeManagerID}
@@ -600,9 +896,28 @@ function updateEmployee() {
     });
 };
 
+function updateManager() {
+    connection.query(`UPDATE managers
+    SET mgr_first_name = "${updatedManagerFirstName}", mgr_last_name = "${updatedManagerLastName}", role_id = ${updatedManagerRoleID}
+    WHERE mgr_full_name ="${updatedManager}";`, function (err, res) {
+        if (err) throw err;
+        updateFullName();
+        advancePrompts();
+    });
+};
+
 function deleteEmployee() {
     connection.query(`DELETE FROM employees
     WHERE full_name = "${updatedEmployee}";`, function (err, res) {
+        if (err) throw err;
+        updateFullName();
+        advancePrompts();
+    });
+};
+
+function deleteManager() {
+    connection.query(`DELETE FROM managers
+    WHERE mgr_full_name = "${updatedManager}";`, function (err, res) {
         if (err) throw err;
         updateFullName();
         advancePrompts();
