@@ -52,7 +52,7 @@ const questions = [
         type: "list",
         name: "action",
         message: "What would you like to do?",
-        choices: ["View All Employees", "View Employees By Department", "View Employees By Manager", "View Managers", "Add Managers","Update/Delete Managers", "View Departments", "Add Departments", "Delete Departments".red, "View Roles", "Add Roles", "Update/Delete Roles", "View Manager Roles", "Add Manager Roles", "Update/Delete Manager Roles","Add Employees", "Update/Delete Employees", "View Budgets", "EXIT".red]
+        choices: ["View All Employees", "View Employees By Department", "View Employees By Manager", "View Employees By Role", "View Managers", "Add Managers","Update/Delete Managers", "View Departments", "Add Departments", "Delete Departments".red, "View Roles", "Add Roles", "Update/Delete Roles", "View Manager Roles", "Add Manager Roles", "Update/Delete Manager Roles","Add Employees", "Update/Delete Employees", "View Budgets", "EXIT".red]
     },
     {
         type: "list",
@@ -74,6 +74,19 @@ const questions = [
         choices: managers,
         when: function (answers) {
             return answers.action === "View Employees By Manager";
+        },
+        filter: function (val) {
+            var splitList = val.split(" ").pop().slice(0, -1);
+            return splitList;
+        }
+    },
+    {
+        type: "list",
+        name: "roleChoice",
+        message: "Select a role:",
+        choices: roles,
+        when: function (answers) {
+            return answers.action === "View Employees By Role";
         },
         filter: function (val) {
             var splitList = val.split(" ").pop().slice(0, -1);
@@ -579,6 +592,7 @@ function askQuestions() {
         title = answers.roleTitle;
         managerTitle = answers.managerRoleTitle;
         roleID = answers.roleID;
+        roleChoice = answers.roleChoice;
         managerRoleID = answers.managerRoleID;
         salary = answers.roleSalary;
         managerSalary = answers.managerRoleSalary;
@@ -624,8 +638,11 @@ function askQuestions() {
         };
 
         if (answers.action === "View Employees By Manager") {
-            console.log(managerChoice);
             viewEmployeesByManager();
+        };
+
+        if (answers.action === "View Employees By Role") {
+            viewEmployeesByRole();
         };
 
         if (answers.action === "View Managers") {
@@ -765,6 +782,19 @@ function viewEmployeesByManager() {
     INNER JOIN employees ON employees.role_id = roles.id
     INNER JOIN managers ON managers.id = employees.manager_id
     WHERE managers.id = "${managerChoice}";`, function (err, res) {
+        if (err) throw err;
+        console.table(res);
+        advancePrompts();
+    });
+};
+
+function viewEmployeesByRole() {
+    connection.query(`SELECT employees.id AS ID, employees.full_name AS NAME, roles.title AS ROLE, departments.dept_name AS DEPARTMENT, CONCAT('$', FORMAT(salary, "C")) AS SALARY
+    FROM departments
+    INNER JOIN roles ON roles.dept_id = departments.id
+    INNER JOIN employees ON employees.role_id = roles.id
+    INNER JOIN managers ON managers.id = employees.manager_id
+    WHERE roles.id = "${roleChoice}";`, function (err, res) {
         if (err) throw err;
         console.table(res);
         advancePrompts();
