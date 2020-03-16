@@ -43,7 +43,7 @@ INSERT INTO managers (id, mgr_first_name, mgr_last_name, role_id)
 VALUES (329569, "Julia", "Fuego", 7813);
 
 INSERT INTO managers (id, mgr_first_name, mgr_last_name, role_id)
-VALUES (103645, "Sammy", "Lynn", 2701);
+VALUES (103645, "Sammy", "Alexander", 2701);
 
 INSERT INTO managers (id, mgr_first_name, mgr_last_name, role_id)
 VALUES (470465, "Richard", "Morris", 1947);

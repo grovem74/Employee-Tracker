@@ -1,7 +1,7 @@
 // Dependencies
 var mysql = require("mysql");
 var inquirer = require("inquirer");
-var consoletable = require("console.table");
+var cTable = require("console.table");
 var colors = require("colors");
 var title = require("./title");
 var fs = require("fs");
@@ -49,7 +49,7 @@ const questions = [
         type: "list",
         name: "action",
         message: "What would you like to do?",
-        choices: ["View Employees", "View Employees By Department", "View Employees By Manager", "View Managers", "View Departments", "Add Department", "Delete Department".red, "View Roles", "Add Role", "Update Role", "Add Employee", "Update Employee", "View Budgets", "EXIT".red]
+        choices: ["View Employees", "View Employees By Department", "View Employees By Manager", "View Managers", "View Departments", "Add Department", "Delete Department".red, "View Roles", "Add Role", "Update/Delete Role", "Add Employee", "Update/Delete Employee", "View Budgets", "EXIT".red]
     },
     {
         type: "list",
@@ -151,7 +151,7 @@ const questions = [
         message: "Select a role:",
         choices: roles,
         when: function (answers) {
-            return answers.action === "Update Role";
+            return answers.action === "Update/Delete Role";
         },
         filter: function (val) {
             var splitList = val.split(" ").pop().slice(0, -1);
@@ -164,7 +164,7 @@ const questions = [
         message: "Select an action:",
         choices: ["Update", "Delete".red],
         when: function (answers) {
-            return answers.action === "Update Role";
+            return answers.action === "Update/Delete Role";
         }
     },
     {
@@ -252,7 +252,7 @@ const questions = [
         message: "Select an employee:",
         choices: employees,
         when: function (answers) {
-            return answers.action === "Update Employee";
+            return answers.action === "Update/Delete Employee";
         }
     },
     {
@@ -261,7 +261,7 @@ const questions = [
         message: "Select an action:",
         choices: ["Update", "Delete".red],
         when: function (answers) {
-            return answers.action === "Update Employee";
+            return answers.action === "Update/Delete Employee";
         }
     },
     {
@@ -431,7 +431,7 @@ function askQuestions() {
             addRole();
         };
 
-        if (answers.action === "Update Role") {
+        if (answers.action === "Update/Delete Role") {
             if (answers.roleUpdateChoice === "Update") {
                 updateRole();
             } else {
@@ -443,7 +443,7 @@ function askQuestions() {
             addEmployee();
         };
 
-        if (answers.action === "Update Employee") {
+        if (answers.action === "Update/Delete Employee") {
             if (answers.employeeUpdateChoice === "Update") {
                 updateEmployee();
             } else {
