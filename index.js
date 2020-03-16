@@ -951,33 +951,44 @@ function deleteManager() {
 };
 
 function viewBudgets() {
-    connection.query(`SELECT departments.id AS ID, dept_name AS DEPARTMENT, CONCAT('$', FORMAT(SUM(roles.salary + mgr_roles.salary), "C")) AS BUDGET, COUNT(employees.id) + COUNT(managers.id) AS EMPLOYEES FROM companydb.departments 
-    INNER JOIN roles ON roles.dept_id = departments.id
-	INNER JOIN mgr_roles ON mgr_roles.dept_id = departments.id		
-    INNER JOIN managers ON managers.role_id = mgr_roles.id
-    INNER JOIN employees ON employees.role_id = roles.id
-    WHERE departments.dept_name = "Customer Service"
-    UNION
- SELECT departments.id AS ID, dept_name AS DEPARTMENT, CONCAT('$', FORMAT(SUM(roles.salary + mgr_roles.salary), "C")) AS BUDGET, COUNT(employees.id) + COUNT(managers.id) AS EMPLOYEES FROM companydb.departments 
-    INNER JOIN roles ON roles.dept_id = departments.id
-	INNER JOIN mgr_roles ON mgr_roles.dept_id = departments.id		
-    INNER JOIN managers ON managers.role_id = mgr_roles.id
-    INNER JOIN employees ON employees.role_id = roles.id
-    WHERE departments.dept_name = "Finance"
-     UNION
-      SELECT departments.id AS ID, dept_name AS DEPARTMENT, CONCAT('$', FORMAT(SUM(roles.salary + mgr_roles.salary), "C")) AS BUDGET, COUNT(employees.id) + COUNT(managers.id) AS EMPLOYEES FROM companydb.departments 
-    INNER JOIN roles ON roles.dept_id = departments.id
-	INNER JOIN mgr_roles ON mgr_roles.dept_id = departments.id		
-    INNER JOIN managers ON managers.role_id = mgr_roles.id
-    INNER JOIN employees ON employees.role_id = roles.id
-    WHERE departments.dept_name = "R&D"
-     UNION
-      SELECT departments.id AS ID, dept_name AS DEPARTMENT, CONCAT('$', FORMAT(SUM(roles.salary + mgr_roles.salary), "C")) AS BUDGET, COUNT(employees.id) + COUNT(managers.id) AS EMPLOYEES FROM companydb.departments 
-    INNER JOIN roles ON roles.dept_id = departments.id
-	INNER JOIN mgr_roles ON mgr_roles.dept_id = departments.id		
-    INNER JOIN managers ON managers.role_id = mgr_roles.id
-    INNER JOIN employees ON employees.role_id = roles.id
-    WHERE departments.dept_name = "Human Resources";`, function (err, res) {
+    connection.query(` SELECT departments.id AS ID, dept_name AS DEPARTMENT, CONCAT('$', FORMAT(SUM(roles.salary + mgr_roles.salary), "C"))
+    AS BUDGET, COUNT(employees.id) + COUNT(managers.id) AS EMPLOYEES FROM companydb.departments 
+       INNER JOIN roles ON roles.dept_id = departments.id
+       INNER JOIN mgr_roles ON mgr_roles.dept_id = departments.id		
+       INNER JOIN managers ON managers.role_id = mgr_roles.id
+       INNER JOIN employees ON employees.role_id = roles.id
+       WHERE departments.dept_name = "Customer Service"
+       UNION
+    SELECT departments.id AS ID, dept_name AS DEPARTMENT, CONCAT('$', FORMAT(SUM(roles.salary + mgr_roles.salary), "C")) 
+    AS BUDGET, COUNT(employees.id) + COUNT(managers.id) AS EMPLOYEES FROM companydb.departments 
+       INNER JOIN roles ON roles.dept_id = departments.id
+       INNER JOIN mgr_roles ON mgr_roles.dept_id = departments.id		
+       INNER JOIN managers ON managers.role_id = mgr_roles.id
+       INNER JOIN employees ON employees.role_id = roles.id
+       WHERE departments.dept_name = "Finance"
+        UNION
+   SELECT departments.id AS ID, dept_name AS DEPARTMENT, CONCAT('$', FORMAT(SUM(roles.salary + mgr_roles.salary), "C"))
+         AS BUDGET, COUNT(employees.id) + COUNT(managers.id) AS EMPLOYEES FROM companydb.departments 
+       INNER JOIN roles ON roles.dept_id = departments.id
+       INNER JOIN mgr_roles ON mgr_roles.dept_id = departments.id		
+       INNER JOIN managers ON managers.role_id = mgr_roles.id
+       INNER JOIN employees ON employees.role_id = roles.id
+       WHERE departments.dept_name = "R&D"
+       UNION
+   SELECT departments.id AS ID, dept_name AS DEPARTMENT, CONCAT('$', FORMAT(SUM(roles.salary + mgr_roles.salary), "C"))
+         AS BUDGET, COUNT(employees.id) + COUNT(managers.id) AS EMPLOYEES FROM companydb.departments 
+       INNER JOIN roles ON roles.dept_id = departments.id
+       INNER JOIN mgr_roles ON mgr_roles.dept_id = departments.id		
+       INNER JOIN managers ON managers.role_id = mgr_roles.id
+       INNER JOIN employees ON employees.role_id = roles.id
+       WHERE departments.dept_name = "Human Resources"
+       UNION
+   SELECT "" AS ID, "                             Totals:" AS DEPARTMENT, CONCAT('$', FORMAT(SUM(roles.salary + mgr_roles.salary), "C")) AS BUDGET,
+   COUNT(employees.id) + COUNT(managers.id) AS EMPLOYEES FROM companydb.departments 
+       INNER JOIN roles ON roles.dept_id = departments.id
+       INNER JOIN mgr_roles ON mgr_roles.dept_id = departments.id		
+       INNER JOIN managers ON managers.role_id = mgr_roles.id
+       INNER JOIN employees ON employees.role_id = roles.id;`, function (err, res) {
         if (err) throw err;
         console.table(res);
         advancePrompts();
