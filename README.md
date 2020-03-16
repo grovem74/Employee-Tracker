@@ -3,7 +3,9 @@
 Username: grovem74<br>
 Email: null<br>
      
-# Employee Tracker
+# Team Tracker
+
+![Team Tracker](/images/TeamTracker.gif)
 
 ![Project Status](https://img.shields.io/badge/status-complete-green)&nbsp;      
 

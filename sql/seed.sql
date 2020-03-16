@@ -60,7 +60,7 @@ INSERT INTO employees (id, first_name, last_name, role_id, manager_id)
 VALUES (825469, "Mike", "Lewis", 4944, 284662);
 
 INSERT INTO employees (id, first_name, last_name, role_id, manager_id)
-VALUES (357829, "Carole", "Anderson", 3635, 103645);
+VALUES (357829, "Carole", "Anderson", 3635, 470465);
 
 
 UPDATE employees

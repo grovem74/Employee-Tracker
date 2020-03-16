@@ -3,7 +3,7 @@ var mysql = require("mysql");
 var inquirer = require("inquirer");
 var cTable = require("console.table");
 var colors = require("colors");
-var title = require("./title");
+var title = require("./images/title");
 var fs = require("fs");
 // var functions= require("./js/functions");
 
@@ -534,7 +534,7 @@ function advancePrompts() {
         if (answers.continue === true) {
             askQuestions();
         } else {
-            connection.end();
+            endSession();
         };
     });
 };
@@ -725,18 +725,7 @@ function askQuestions() {
         };
 
         if (answers.action === "EXIT".red) {
-            var disconnectMessages = [
-                "Productivity tip #1: Turn off Distractions...",
-                "Productivity tip #2: Take Breaks...",
-                "Productivity tip #3: Eat a Healthy Breakfast..." ,
-                "Productivity tip #4: Get Some Exercise...",
-                "Productivity tip #5: Record All Your Thoughts And Ideas...",
-                "Productivity tip #6: Laugh More...",
-                "Productivity tip #7: Have a Plan..."
-            ];
-            var disconnectMessage = disconnectMessages[Math.floor(Math.random()*disconnectMessages.length)];
-            console.log(`HAVE A GREAT DAY!\n\n${disconnectMessage.green.bold}`);
-            connection.end();
+            endSession();
         };
     });
 };
@@ -993,6 +982,21 @@ function updateFullName() {
         if (err) throw err;
     })
 };
+
+function endSession(){
+    var disconnectMessages = [
+        "Productivity tip #1: Turn off Distractions...",
+        "Productivity tip #2: Take Breaks...",
+        "Productivity tip #3: Eat a Healthy Breakfast..." ,
+        "Productivity tip #4: Get Some Exercise...",
+        "Productivity tip #5: Record All Your Thoughts And Ideas...",
+        "Productivity tip #6: Laugh More...",
+        "Productivity tip #7: Have a Plan..."
+    ];
+    var disconnectMessage = disconnectMessages[Math.floor(Math.random()*disconnectMessages.length)];
+    console.log(`HAVE A GREAT DAY!\n\n${disconnectMessage.green.bold}`);
+    connection.end();
+} 
 
 // make connection variable available to functions in external file
     //exports.connection = connection;
