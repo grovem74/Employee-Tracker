@@ -18,7 +18,7 @@ var connection = mysql.createConnection({
 
 connection.connect((err) => {
     if (err) throw err;
-    console.log("connected as id " + connection.threadId + "\n");
+    // console.log("connected as id " + connection.threadId + "\n");
     console.log(title.appName.green);
     getDepartments();
     getRoles();
@@ -846,7 +846,7 @@ function addDepartment() {
     });
 }
 
-function deleteDepartment() { console.log(deletedDepartmentName);
+function deleteDepartment() {
     connection.query(`DELETE FROM departments
     WHERE id = "${deletedDepartmentName}";`, function (err, res) {
         if (err) throw err;
@@ -875,9 +875,6 @@ function updateRole() {
     SET title = "${updatedTitle}", salary = ${updatedSalary} 
     WHERE id = "${updatedRole}";`, function (err, res) {
         if (err) throw err;
-        console.log(updatedTitle);
-        console.log(updatedSalary);
-        console.log(updatedRole);
         advancePrompts();
     });
 }
