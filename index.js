@@ -207,7 +207,7 @@ const questions = [
     // Delete a department
     {
         type: "list",
-        name: "deptDeleteName",
+        name: "deptDelete",
         message: "Select department to delete:",
         choices: departments,
         when: function (answers) {
@@ -591,7 +591,7 @@ async function getEmployees() {
 function askQuestions() {
     return inquirer.prompt(questions).then(answers => {
         departmentName = answers.deptName;
-        deletedDepartmentName = answers.deptDeleteName;
+        deletedDepartment = answers.deptDelete;
         managerChoice = answers.managerChoice;
         title = answers.roleTitle;
         managerTitle = answers.managerRoleTitle;
@@ -629,7 +629,6 @@ function askQuestions() {
         updatedManagerFirstName = answers.updatedManagerFirstName;
         updatedManagerLastName = answers.updatedManagerLastName;
         updatedEmployeeRole = answers.updatedEmployeeRole;
-        updatedManagerRole = answers.updatedManagerRole;
         updatedEmployeeManager = answers.updatedEmployeeManager;
 
         if (answers.action === "View All Employees") {
@@ -698,12 +697,12 @@ function askQuestions() {
         };
 
         if (answers.action === "Add Manager Roles") {
-            managerRoles.push(`${answers.deptName} - ${answers.deptID}`);
+            managerRoles.push(`${answers.title} - ${answers.id}`);
             addManagerRole();
         };
 
         if (answers.action === "Update/Delete Manager Roles") {
-            if (answers.roleUpdateChoice === "Update") {
+            if (answers.managerRoleUpdateChoice === "Update") {
                 updateManagerRole();
             } else {
                 deleteManagerRole();
@@ -760,7 +759,7 @@ function viewEmployeesByDepartment() {
     INNER JOIN roles ON roles.dept_id = departments.id)
     INNER JOIN employees ON employees.role_id = roles.id)
     INNER JOIN managers ON managers.id = employees.manager_id)
-    WHERE departments.dept_name = "${departmentChoice}";`, function (err, res) {
+    WHERE departments.id = "${departmentChoice}";`, function (err, res) {
         if (err) throw err;
         console.table(res);
         advancePrompts();
@@ -773,7 +772,7 @@ function viewEmployeesByManager() {
     INNER JOIN roles ON roles.dept_id = departments.id
     INNER JOIN employees ON employees.role_id = roles.id
     INNER JOIN managers ON managers.id = employees.manager_id
-    WHERE managers.mgr_full_name = "${managerChoice}";`, function (err, res) {
+    WHERE managers.id = "${managerChoice}";`, function (err, res) {
         if (err) throw err;
         console.table(res);
         advancePrompts();
@@ -786,7 +785,7 @@ function viewEmployeesByRole() {
     INNER JOIN roles ON roles.dept_id = departments.id
     INNER JOIN employees ON employees.role_id = roles.id
     INNER JOIN managers ON managers.id = employees.manager_id
-    WHERE roles.title = "${roleChoice}";`, function (err, res) {
+    WHERE roles.id = "${roleChoice}";`, function (err, res) {
         if (err) throw err;
         console.table(res);
         advancePrompts();
@@ -840,7 +839,7 @@ function addDepartment() {
 
 function deleteDepartment() {
     connection.query(`DELETE FROM departments
-    WHERE dept_name = "${deletedDepartmentName}";`, function (err, res) {
+    WHERE id = "${deletedDepartment}";`, function (err, res) {
         if (err) throw err;
         advancePrompts();
     });
@@ -874,7 +873,7 @@ function updateRole() {
 function updateManagerRole() {
     connection.query(`UPDATE mgr_roles
     SET title = "${updatedManagerTitle}", salary = ${updatedManagerSalary} 
-    WHERE id = "${updatedManagerRole}";`, function (err, res) {
+    WHERE id = ${updatedManagerRole};`, function (err, res) {
         if (err) throw err;
         advancePrompts();
     });
@@ -919,7 +918,6 @@ function updateEmployee() {
     SET first_name = "${updatedFirstName}", last_name = "${updatedLastName}", role_id = ${updatedEmployeeRole}, manager_id = ${updatedEmployeeManager}
     WHERE full_name="${updatedEmployee}";`, function (err, res) {
         if (err) throw err;
-        console.log("NEW FIRST NAME", updatedFirstName);
         updateEmployeeFullName();
         advancePrompts();
     });
@@ -946,7 +944,7 @@ function deleteEmployee() {
 
 function deleteManager() {
     connection.query(`DELETE FROM managers
-    WHERE mgr_full_name = "${updatedManager}";`, function (err, res) {
+    WHERE id = ${updatedManager};`, function (err, res) {
         if (err) throw err;
         updateManagerFullName();
         advancePrompts();
