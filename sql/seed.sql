@@ -15,7 +15,10 @@ INSERT INTO roles (id, title, salary, dept_id)
 VALUES (4944, "HR Rep", 63000, 37);
 
 INSERT INTO roles (id, title, salary, dept_id)
-VALUES (3898, "Analyst", 55000, 93);
+VALUES (3898, "Analyst 1", 55000, 93);
+
+INSERT INTO roles (id, title, salary, dept_id)
+VALUES (3788, "Analyst 2", 60000, 93);
 
 INSERT INTO roles (id, title, salary, dept_id)
 VALUES (2946, "Customer Service Rep", 48000, 67);
