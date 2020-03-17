@@ -604,7 +604,8 @@ function askQuestions() {
         roleDeptID = answers.roleDeptID;
         managerRoleDeptID = answers.managerRoleDeptID;
         updatedRole = answers.roleUpdate;
-        updatedManagerRole = answers.managerRoleUpdate;
+        updatedManagerRole = answers.updatedManagerRole;
+        managerRoleUpdate = answers.managerRoleUpdate;
         updatedTitle = answers.updateTitle;
         updatedManagerTitle = answers.updateManagerTitle;
         updatedSalary = answers.updateSalary;
@@ -870,7 +871,7 @@ function updateRole() {
     });
 }
 
-function updateManagerRole() {
+function updateManagerRole() { console.log(managers); console.log("updatedManagerRole: ", updatedManagerRole);
     connection.query(`UPDATE mgr_roles
     SET title = "${updatedManagerTitle}", salary = ${updatedManagerSalary} 
     WHERE id = ${updatedManagerRole};`, function (err, res) {
@@ -879,7 +880,7 @@ function updateManagerRole() {
     });
 };
 
-function deleteRole() {
+function deleteRole() {S
     connection.query(`DELETE FROM roles
     WHERE id = "${updatedRole}";`, function (err, res) {
         if (err) throw err;
@@ -904,7 +905,7 @@ function addEmployee() {
     });
 };
 
-function addManager() {
+function addManager() { 
     connection.query(`INSERT INTO managers (id, mgr_first_name, mgr_last_name, role_id)
     VALUES (${managerID}, "${managerFname}", "${managerLname}", "${managerRole}");`, function (err, res) {
         if (err) throw err;
@@ -926,7 +927,7 @@ function updateEmployee() {
 function updateManager() {
     connection.query(`UPDATE managers
     SET mgr_first_name = "${updatedManagerFirstName}", mgr_last_name = "${updatedManagerLastName}", role_id = ${updatedManagerRole}
-    WHERE mgr_full_name="${updatedManager}";`, function (err, res) {
+    WHERE id = ${updatedManager};`, function (err, res) {
         if (err) throw err;
         updateManagerFullName();
         advancePrompts();
@@ -952,7 +953,7 @@ function deleteManager() {
 };
 
 function viewBudgets() {
-    connection.query(` SELECT departments.id AS ID, dept_name AS DEPARTMENT, CONCAT('$', FORMAT(SUM(roles.salary + mgr_roles.salary), "C"))
+    connection.query(`SELECT departments.id AS ID, dept_name AS DEPARTMENT, CONCAT('$', FORMAT(SUM(roles.salary + mgr_roles.salary), "C"))
     AS BUDGET, COUNT(employees.id) + COUNT(managers.id) AS EMPLOYEES FROM companydb.departments 
        INNER JOIN roles ON roles.dept_id = departments.id
        INNER JOIN mgr_roles ON mgr_roles.dept_id = departments.id		
